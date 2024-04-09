@@ -1,0 +1,33 @@
+.itemOuter{
+    /* border: solid 1px black; */
+    margin: auto;
+    padding: 10px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media (max-width:450px){
+    .itemOuter{
+        padding: 0px;
+    }
+}

@@ -1,0 +1,32 @@
+.css-1ex1afd-MuiTableCell-root,
+.css-1ygcj2i-MuiTableCell-root {
+    text-align: center !important;
+}
+
+.tss-178gktx-MUIDataTableHeadCell-contentWrapper {
+    display: grid !important;
+}
+
+.css-q34dxg {
+    text-align: center !important;
+}
+
+.form-check {
+    display: flex !important;
+    gap: 5px !important;
+    /* align-items: center; */
+    min-height: 1.5rem !important;
+    margin-left: 20px;
+    padding-left: 1.5em !important;
+    /* margin-right: 20px; */
+    margin-bottom: .125rem !important;
+
+}
+
+.css-1bigob2 div {
+    text-align: center;
+}
+
+.css-i4bv87-MuiSvgIcon-root{
+    cursor: pointer;
+}

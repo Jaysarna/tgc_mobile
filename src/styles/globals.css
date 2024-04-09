@@ -1,0 +1,9 @@
+@import url("https://css.gg/css");
+
+
+:root{
+    --primary-color: #7F56D9;
+    --danger:#D92D20;
+    --success:#4CAF50;
+    --gray:#344054;
+}

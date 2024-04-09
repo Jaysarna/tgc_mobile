@@ -1,0 +1,35 @@
+.App {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+  
+  .user-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .user-table th,
+  .user-table td {
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .user-table th {
+    background-color: #f9f9f9;
+  }
+  
+  .username {
+    color: #888;
+  }
+  
+  .team {
+    display: inline-block;
+    background-color: #e1ecf4;
+    color: #0073b1;
+    border-radius: 2px;
+    padding: 3px 6px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+  }
+  

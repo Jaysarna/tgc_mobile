@@ -1,0 +1,45 @@
+.pointer-cursor {
+  cursor: pointer;
+}
+
+.notification-outer {
+  /* position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: -1; */
+}
+
+.bell-outer {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 20;
+}
+
+.notification-wrapper,
+.notification-wrapper-active {
+  position: absolute;
+  top: 65px;
+  right: -10px;
+  max-width: 400px;
+  width: 100%;
+  height: 400px;
+  overflow-y: auto;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+  /* z-index: -1; */
+  display: none;
+  padding: 20px;
+}
+
+.notification-wrapper-active li {
+  margin-top: 7px;
+}
+
+.notification-wrapper-active {
+  top: 65px;
+  opacity: 1;
+  z-index: 1;
+  right: 10px;
+  display: block;
+}
