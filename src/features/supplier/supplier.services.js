@@ -60,30 +60,33 @@ const addNewSupplier = async (
 
 export const getSupplierList = async () => {
     try {
-        const res = await toast.promise(
-            get('resource/Supplier'),
-            {
-                loading: 'Getting the Supplier List...',
-                success: (res) => res && '',
-                error: 'Reload ...',
-                style: {
-                    minWidth: '250px',
-                    borderRadius: '8px',
-                    padding: '16px',
-                    color: '#ffffff', // Text color
-                    backgroundColor: '#4caf50', // Success background color
-                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                },
+        // const res = await toast.promise(
+        //     get('resource/Supplier'),
+        //     {
+        //         loading: '',
+        //         success: (res) => res && '',
+        //         error: 'Reload ...',
+        //         style: {
+        //             minWidth: '250px',
+        //             borderRadius: '8px',
+        //             padding: '16px',
+        //             color: '#ffffff', // Text color
+        //             backgroundColor: '#4caf50', // Success background color
+        //             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        //         },
 
 
-                icon: (status) => {
-                    return status === 'loading' ? '⏳' : status === 'success' ? '✅' : '❌';
-                },
-            }
-        )
+        //         icon: (status) => {
+        //             return status === 'loading' ? '⏳' : status === 'success' ? '✅' : '❌';
+        //         },
+        //     }
+        // )
+
+        const res = await get('resource/Supplier');
         return res
     } catch (err) {
-        console.log('fired')
+        // console.log('fired')
+        console.log(err)
     }
 }
 

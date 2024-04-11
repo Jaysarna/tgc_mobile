@@ -3,7 +3,7 @@ import { TextField, Dialog, DialogTitle, DialogContent, DialogActions, Button } 
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import SearchSelect from './SeachSelect';
 
-export default function SearchCreateItem({ selectList, handleAddNewItem, cusList, handleItemNameChange, handleUpdateValue, name, handleAdd, itemOptionList }) {
+export default function SearchCreateItem({ selectList, uid, quantity, handleAddNewItem, cusList, handleItemNameChange, handleUpdateValue, name, handleAdd, itemOptionList }) {
     const [openDialog, setOpenDialog] = useState(false);
     const [newItemName, setNewItemName] = useState('');
     const [newSupplierName, setNewSupplierName] = useState('');
@@ -20,7 +20,7 @@ export default function SearchCreateItem({ selectList, handleAddNewItem, cusList
         } else {
             console.log(newValue)
             setValue(newValue);
-            handleItemNameChange(newValue);
+            handleItemNameChange(newValue, uid, quantity);
             setNewSupplierName(newValue)
         }
     };
@@ -92,12 +92,13 @@ export default function SearchCreateItem({ selectList, handleAddNewItem, cusList
             <Dialog open={openDialog} onClose={handleDialogClose}>
                 <DialogTitle>Add New Item</DialogTitle>
                 <DialogContent>
-                    <SearchSelect
+                    {/* <SearchSelect
                         cusList={selectList}
                         handleUpdateValue={handleNewSupplierNameChange}
                         name={name}
                         handleAdd={handleAdd}
-                    />
+
+                    /> */}
                     <TextField
                         autoFocus
                         margin="dense"

@@ -13,6 +13,7 @@ import SearchSelect from '@/customhook/autocomplete/SeachSelect';
 import SearchCreateItem from '@/customhook/autocomplete/SearchCreateItem';
 import addnewItem from '@/features/item/item.services';
 import { getSupplierList } from '@/features/supplier/supplier.services';
+import { uid } from 'uid';
 
 
 let name = "Customer"
@@ -36,7 +37,8 @@ const InvoiceData = () => {
         docStatus: 1,
         custom_sample: 0,
         items: [{
-            // uid: uid(),
+            uid: uid(),
+            item_code: localStorage.getItem('saleItem') ? localStorage.getItem('saleItem') : '',
             itemName: localStorage.getItem('saleItem') ? localStorage.getItem('saleItem') : '',
             quantity: 1,
             rate: localStorage.getItem('saleRate') ? localStorage.getItem('saleRate') : '',
@@ -48,7 +50,7 @@ const InvoiceData = () => {
 
     const addNewItem = () => {
         const newItem = {
-            // uid: uid(),
+            uid: uid(),
             item_code: '',
             item_name: '',
             itemName: '',
@@ -88,19 +90,20 @@ const InvoiceData = () => {
         console.log(updatedItem)
         // Update the item in customerData.items using the updatedItem data
         const updatedItems2 = customerData.items.map((item) => {
-            if (item.item_code === updatedItem.item_code) {
+
+            if (item.item_code === updatedItem.item_code || item?.uid == updatedItem?.uid) {
                 return updatedItem;
             }
             return item;
         });
 
-        console.log(customerData)
+        console.log(updatedItems2)
         setCustomerData({
             ...customerData,
             items: updatedItems2
         });
 
-
+        console.log(customerData)
     };
 
 
@@ -121,7 +124,7 @@ const InvoiceData = () => {
         function buildItemsArray(jsonItems) {
 
             return jsonItems.map((jsonItem) => ({
-                "item_code": jsonItem.itemName,
+                "item_code": jsonItem.item_code,
                 "qty": jsonItem.quantity,
                 "rate": jsonItem.rate,
             }));
@@ -374,16 +377,17 @@ const DataTable = ({ head, itemList, addNewItem, removeList, handleItemChange, h
                                     {
                                         itemList.map((item, index) => {
                                             return (
-                                                <>
-                                                    <TableDataList key={index}
-                                                        item={item}
-                                                        removeList={removeList}
-                                                        handleItemChange={handleItemChange}
-                                                        cusList={cusList}
-                                                        handleUpdateValue={handleUpdateValue}
-                                                        handleAdd={handleAdd}
-                                                    />
-                                                </>
+
+                                                <TableDataList
+                                                    key={index}
+                                                    item={item}
+                                                    removeList={removeList}
+                                                    handleItemChange={handleItemChange}
+                                                    cusList={cusList}
+                                                    handleUpdateValue={handleUpdateValue}
+                                                    handleAdd={handleAdd}
+                                                />
+
                                             )
                                         })
                                     }
@@ -433,18 +437,22 @@ const TableDataList = ({ item, removeList, handleItemChange, handleAdd, handleUp
     const route = useRouter();
 
 
-    const handleItemNameChange = async (item) => {
+    const handleItemNameChange = async (item, uid, quantity) => {
         console.log(item)
         const selectedItemId = item?.item_code;
         const selectedOption = itemOptionList.find((option) => option.item_code === selectedItemId);
 
         const last_sale_price = await handleItemPrice(selectedItemId)
 
+        console.log(selectedOption)
 
         if (selectedOption) {
             const newItem = {
                 ...item,
-                itemName: selectedOption.item_code,
+                uid: uid,
+                itemName: selectedOption?.item_code,
+                item_code: selectedOption?.item_code,
+                quantity: quantity,
                 rate: last_sale_price,
             };
             handleItemChange(newItem);
@@ -518,6 +526,8 @@ const TableDataList = ({ item, removeList, handleItemChange, handleAdd, handleUp
                     <SearchCreateItem
                         name={name}
                         itemOptionList={itemOptionList}
+                        uid={item?.uid}
+                        quantity={item?.quantity}
                         handleItemNameChange={handleItemNameChange}
                         cusList={cusList}
                         handleUpdateValue={handleUpdateValue}
@@ -531,6 +541,8 @@ const TableDataList = ({ item, removeList, handleItemChange, handleAdd, handleUp
                             if (res?.data) {
 
                                 handleItemNameChange({
+                                    uid: item.uid,
+                                    quantity: item.quantity,
                                     item_name: res?.data.item_name,
                                     item_code: res?.data?.item_code
                                 })
