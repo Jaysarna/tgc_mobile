@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
 import { TextField, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import SearchSelect from './SeachSelect';
 
-export default function SearchSelect({ cusList, handleUpdateValue, name, handleAdd }) {
+export default function SearchCreateItem({ selectList, handleAddNewItem, cusList, handleItemNameChange, handleUpdateValue, name, handleAdd, itemOptionList }) {
     const [openDialog, setOpenDialog] = useState(false);
+    const [newItemName, setNewItemName] = useState('');
     const [newSupplierName, setNewSupplierName] = useState('');
-    const [value, setValue] = useState(null); // Initialize value state
+    const [value, setValue] = useState(null);
 
     const filter = createFilterOptions();
 
     const handleAutocompleteChange = (event, newValue) => {
         if (newValue && newValue.inputValue) {
-            // Open dialog if user typed a new value
             setOpenDialog(true);
-            setNewSupplierName(newValue.inputValue); // Set new supplier name
+            // console.log(newValue)
+            setNewItemName(newValue.inputValue);
+
         } else {
-            // Update value state for existing options
+            console.log(newValue)
             setValue(newValue);
-            handleUpdateValue(newValue); // Call parent handler
+            handleItemNameChange(newValue);
+            setNewSupplierName(newValue)
         }
     };
 
@@ -27,18 +31,23 @@ export default function SearchSelect({ cusList, handleUpdateValue, name, handleA
 
     const handleDialogClose = () => {
         setOpenDialog(false);
+        setNewItemName('');
         setNewSupplierName('');
     };
 
-    const handleAddSupplier = () => {
-
-
+    const handleAddItem = async () => {
+        handleAddNewItem(newItemName, newSupplierName);
 
         handleDialogClose();
     };
 
-    const handleNewSupplierNameChange = (event) => {
-        setNewSupplierName(event.target.value);
+    const handleNewItemNameChange = (event) => {
+        setNewItemName(event.target.value);
+    };
+
+    const handleNewSupplierNameChange = (value) => {
+        const newValue = (typeof value === 'object') ? value?.name : value;
+        setNewSupplierName(newValue);
     };
 
     return (
@@ -53,14 +62,14 @@ export default function SearchSelect({ cusList, handleUpdateValue, name, handleA
                     if (params.inputValue !== '') {
                         filtered.push({
                             inputValue: params.inputValue,
-                            name: `Add "${params.inputValue}"`,
+                            item_name: `Add "${params.inputValue}"`,
                         });
                     }
 
                     return filtered;
                 }}
                 id="free-solo-dialog-demo"
-                options={cusList}
+                options={itemOptionList}
                 getOptionLabel={(option) => {
                     if (typeof option === 'string') {
                         return option;
@@ -68,44 +77,49 @@ export default function SearchSelect({ cusList, handleUpdateValue, name, handleA
                     if (option.inputValue) {
                         return option.inputValue;
                     }
-                    return option?.name || '';
+                    return option?.item_name || '';
                 }}
                 selectOnFocus
                 clearOnBlur
                 handleHomeEndKeys
-                renderOption={(props, option) => <li {...props}>{option?.name}</li>}
-                sx={{ width: '100 %' }}
+                renderOption={(props, option) => <li {...props}>{option?.item_name}</li>}
+                sx={{ width: '100%' }}
                 freeSolo
                 renderInput={(params) => (
-                    <TextField {...params} label={`Select ${name}`} />
+                    <TextField {...params} label={`Select Item`} />
                 )}
             />
             <Dialog open={openDialog} onClose={handleDialogClose}>
-                <DialogTitle>Add New {name}</DialogTitle>
+                <DialogTitle>Add New Item</DialogTitle>
                 <DialogContent>
+                    <SearchSelect
+                        cusList={selectList}
+                        handleUpdateValue={handleNewSupplierNameChange}
+                        name={name}
+                        handleAdd={handleAdd}
+                    />
                     <TextField
                         autoFocus
                         margin="dense"
-                        id="newSupplierName"
-                        label={`${name}`}
+                        id="newItemName"
+                        label={`New Item Name`}
                         type="text"
-                        fullWidth
-                        value={newSupplierName}
-                        onChange={handleNewSupplierNameChange}
+                        size='small'
+                        value={newItemName}
+                        onChange={handleNewItemNameChange}
                     />
+
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => {
-                        handleAdd(newSupplierName)
-                    }}>Cancel</Button>
                     <Button
-                        onClick={handleAddSupplier}
-                        disabled={!newSupplierName.trim()}
+                        onClick={handleAddItem}
+                        disabled={!newItemName.trim()}
                         variant="contained"
                         color="primary"
                     >
                         Add
                     </Button>
+                    <Button onClick={handleDialogClose}>Cancel</Button>
                 </DialogActions>
             </Dialog>
         </div>

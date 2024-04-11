@@ -8,21 +8,26 @@ const authHeader = getAuthHeader();
 const api = axios.create({
     baseURL: baseURL,
     timeout: 10000,
-    authHeader,
+    headers: {
+        'Content-Type': 'application/json',
+    }
 });
 
-// Set up request interceptor to include authorization token if available
-// api.interceptors.request.use(config => {
-//     const token = localStorage.getItem('userAccessToken');
-//     if (token) {
-//         config.headers['Authorization'] = `Bearer ${token}`;
-//     }
-//     return config;
-// }, error => {
-//     return Promise.reject(error);
-// });
+api.interceptors.request.use(config => {
+    if (typeof window !== 'undefined') {
+        let api_key1 = sessionStorage.getItem('api_key');
+        let api_secret1 = sessionStorage.getItem('api_secret');
+        if (!api_key1 || !api_secret1) {
+            return null;
+        }
+        config.headers['Authorization'] = `token ${api_key1}:${api_secret1}`;
+    }
 
-// Helper function to handle API errors
+    return config;
+}, error => {
+    return Promise.reject(error);
+});
+
 const handleApiError = error => {
     if (error.response) {
         console.error('API Error:', error.response.status, error.response.data);

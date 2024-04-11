@@ -20,7 +20,7 @@ const ItemList = () => {
             ['docstatus', '=', '1'],
             ['status', '!=', 'Cancel']
         ];
-        const fields = ['name', 'supplier', 'grand_total', 'outstanding_amount'];
+        const fields = ['name', 'supplier', 'grand_total', 'outstanding_amount', 'posting_date'];
 
         // Construct the dynamic URL
         const url = `${apiUrl}?filters=${encodeURIComponent(JSON.stringify(filters))}&fields=${encodeURIComponent(JSON.stringify(fields))}`;
@@ -95,7 +95,7 @@ const DataTable = ({ tableData }) => {
             label: 'Grand Total'
         },
         {
-            name: 'creation',
+            name: 'posting_date',
             label: 'Date'
         },
         {

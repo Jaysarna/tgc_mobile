@@ -6,6 +6,7 @@ import withAuth from '@/customhook/withAuth'
 import { useRouter } from 'next/router'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { getAuthHeader } from '@/helpers/Header'
+import moment from 'moment'
 
 const ItemList = () => {
   const [tableData, setTableData] = useState([])
@@ -54,8 +55,13 @@ const ItemList = () => {
       }
     },
     {
-      name: 'creation',
-      label: 'Date'
+      name: 'posting_date',
+      label: 'Date',
+      options: {
+        customBodyRender: value => {
+          return <> {moment(value).format('DD-MM-YYYY')}</>
+        }
+      }
     },
     {
       name: 'actual_qty',

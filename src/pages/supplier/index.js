@@ -11,6 +11,7 @@ import { getAuthHeader } from '@/helpers/Header';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import moment from 'moment';
 
 
 
@@ -90,6 +91,7 @@ const DataTable = () => {
 
     const columns = !sample
         ? [
+            { name: 'Date ', },
             { name: 'Supplier Name', },
             {
                 name: 'Outstanding Amount', options: {
@@ -103,7 +105,7 @@ const DataTable = () => {
             },
             { name: 'Create', },
             { name: 'Edit ', },
-            { name: 'Date ', },
+
         ]
         : [
             {
@@ -121,7 +123,7 @@ const DataTable = () => {
                         <div>
                             {value.map(invoice => (
                                 <div key={invoice.invoice}>
-                                    <div>{invoice.invoice}</div>
+                                    <div>{invoice.invoice} {" "} {moment(invoice?.posting_date).format('DD MMM YY')}</div>
                                     <div>
                                         {invoice.item_list.map(item => (
                                             <div key={item}>{item}</div>
@@ -133,14 +135,16 @@ const DataTable = () => {
                     )
                 }
             },
-            { name: 'Date ', }
+
         ];
 
 
     const data = !sample
         ? tableData.map(item => [
+            item[2],
             item[0],
             item[1],
+
             <AddIcon
                 className="plus-icon-btn"
                 onClick={() => route.push(`/supplier/${item[0]}/make-payment`)}
@@ -149,6 +153,7 @@ const DataTable = () => {
         ])
         : sampleData.map(item => [
             item.supplier,
+            item.invoices,
             item.invoices
         ]);
     // sampleData.map(item => [

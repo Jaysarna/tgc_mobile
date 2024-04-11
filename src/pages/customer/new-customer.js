@@ -6,6 +6,7 @@ import withAuth from '@/customhook/withAuth';
 import useNotifications from '@/customhook/notification';
 import { handleError } from '@/Api/showError';
 import { getAuthHeader } from '@/helpers/Header';
+import toast from 'react-hot-toast';
 
 const NewCustomer = () => {
 
@@ -46,18 +47,18 @@ const NewCustomer = () => {
             },
         };
         try {
-            const response = await axios.post(apiUrl, requestData,authHeader)
+            const response = await axios.post(apiUrl, requestData, authHeader)
 
             if (response.statusText === 'OK') {
-                alert("Customer Added Successfully")
-                
+                toast.success("Customer Added Successfully")
+
                 route.push('/main')
             }
             // console.log('API Response:', response.statusText)
         } catch (error) {
             // Handle any errors that occur during the request
-         
-            console.error('API Error:', error);
+
+            toast.error('API Error:');
             if (error.response.status === 403) {
                 alert("Login Expired")
                 route.push('/')

@@ -6,7 +6,12 @@ const Layout = ({ children }) => {
     return (
         <div>
 
-            <Toaster />
+            <Toaster
+                position="top-right"
+                autoClose={3000}
+                closeOnClick
+
+            />
             {children}
         </div>
     );

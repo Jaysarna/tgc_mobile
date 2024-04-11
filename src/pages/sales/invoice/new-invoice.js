@@ -3,14 +3,19 @@ import React, { useEffect, useState } from 'react';
 import Siderbar from '@/helpers/siderbar';
 import axios from 'axios';
 import { authHeader, getAuthHeader } from '@/helpers/Header';
-import { uid } from 'uid';
+// import { uid } from 'uid';
 import withAuth from '@/customhook/withAuth';
 import { handleError } from '@/Api/showError';
 import { handleItemPrice } from '@/features/item/getItemByItemCode';
 import { LoadingPage } from '@/helpers/Loader';
+import addNewCustomer from '@/features/customer/customer.services';
+import SearchSelect from '@/customhook/autocomplete/SeachSelect';
+import SearchCreateItem from '@/customhook/autocomplete/SearchCreateItem';
+import addnewItem from '@/features/item/item.services';
+import { getSupplierList } from '@/features/supplier/supplier.services';
 
 
-
+let name = "Customer"
 const Index = () => {
     return (
         <div>
@@ -31,7 +36,7 @@ const InvoiceData = () => {
         docStatus: 1,
         custom_sample: 0,
         items: [{
-            uid: uid(),
+            // uid: uid(),
             itemName: localStorage.getItem('saleItem') ? localStorage.getItem('saleItem') : '',
             quantity: 1,
             rate: localStorage.getItem('saleRate') ? localStorage.getItem('saleRate') : '',
@@ -43,7 +48,9 @@ const InvoiceData = () => {
 
     const addNewItem = () => {
         const newItem = {
-            uid: uid(),
+            // uid: uid(),
+            item_code: '',
+            item_name: '',
             itemName: '',
             quantity: 1,
             rate: 0,
@@ -66,7 +73,7 @@ const InvoiceData = () => {
     const removeList = (itemNameToFilter) => {
         // console.log(itemNameToFilter)
 
-        const filteredItems = customerData.items.filter(item => item.uid !== itemNameToFilter);
+        const filteredItems = customerData.items.filter(item => item.item_code !== itemNameToFilter);
 
         // Update the customerData state with the filtered array
         setCustomerData({
@@ -78,13 +85,16 @@ const InvoiceData = () => {
 
 
     function handleItemChange(updatedItem) {
+        console.log(updatedItem)
         // Update the item in customerData.items using the updatedItem data
         const updatedItems2 = customerData.items.map((item) => {
-            if (item.uid === updatedItem.uid) {
+            if (item.item_code === updatedItem.item_code) {
                 return updatedItem;
             }
             return item;
         });
+
+        console.log(customerData)
         setCustomerData({
             ...customerData,
             items: updatedItems2
@@ -98,13 +108,7 @@ const InvoiceData = () => {
 
     const route = useRouter();
 
-    const handleCustomerDataChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setCustomerData({
-            ...customerData,
-            [name]: type === 'checkbox' ? checked : value,
-        });
-    };
+
 
     const handleAddCustomer = async (e) => {
         setLoading(true)
@@ -202,6 +206,13 @@ const InvoiceData = () => {
     }
 
 
+    const handleUpdateValue = (value) => {
+        // console.log(value)
+        const newValue = (typeof value === 'object') ? value?.name : value;
+
+        setCustomerData({ ...customerData, customerName: newValue });
+    };
+
 
 
     useEffect(() => {
@@ -238,31 +249,17 @@ const InvoiceData = () => {
                                     </div>
 
                                     <form onSubmit={handleAddCustomer} method="post" className="row g-3 needs-validation">
-                                        <div className="col-12">
-                                            <label htmlFor="customerName" className="form-label">Customer Name</label>
-                                            <div className="has-validation">
-                                                <select
-                                                    name="customerName"
-                                                    className="form-select"
-                                                    id="customerName"
-                                                    required
-                                                    value={customerData.customerName}
-                                                    onChange={handleCustomerDataChange}
-                                                >
-                                                    <option value="">Select a customer name</option>
-                                                    {
-                                                        cusList.length > 0 && cusList.map((item, index) => {
-                                                            return (
-                                                                <>
-                                                                    <option value={item.name} key={index}>{item.name}</option>
-                                                                </>
-                                                            )
-                                                        })
-                                                    }
-                                                    {/* Add more options as needed */}
-                                                </select>
-                                                <div className="invalid-feedback">Please enter the customer name.</div>
-                                            </div>
+
+
+                                        <div className='col-12 mb-4'>
+                                            <SearchSelect
+                                                cusList={cusList}
+                                                handleUpdateValue={handleUpdateValue}
+                                                name="Customer"
+                                                handleAdd={(updatedValue) => {
+                                                    addNewCustomer({ customerName: updatedValue })
+                                                }}
+                                            />
                                         </div>
                                         <div className="col-12 mb-4">
                                             <label htmlFor="postingDate" className="form-label">Posting Date</label>
@@ -316,6 +313,12 @@ const InvoiceData = () => {
                                             addNewItem={addNewItem}
                                             removeList={removeList}
                                             handleItemChange={handleItemChange}
+                                            cusList={cusList}
+                                            handleUpdateValue={handleUpdateValue}
+
+                                            handleAdd={(updatedValue) => {
+                                                addNewCustomer({ customerName: updatedValue })
+                                            }}
                                         />
 
                                         <div className="w-100">
@@ -333,7 +336,7 @@ const InvoiceData = () => {
 };
 
 
-const DataTable = ({ head, itemList, addNewItem, removeList, handleItemChange }) => {
+const DataTable = ({ head, itemList, addNewItem, removeList, handleItemChange, handleAdd, handleUpdateValue, cusList }) => {
 
 
     const [totalAmount, setTotalAmount] = useState(0)
@@ -376,14 +379,14 @@ const DataTable = ({ head, itemList, addNewItem, removeList, handleItemChange })
                                                         item={item}
                                                         removeList={removeList}
                                                         handleItemChange={handleItemChange}
+                                                        cusList={cusList}
+                                                        handleUpdateValue={handleUpdateValue}
+                                                        handleAdd={handleAdd}
                                                     />
                                                 </>
                                             )
                                         })
                                     }
-
-
-
                                 </tbody>
                             </table>
                         </div>
@@ -425,13 +428,14 @@ const DataTable = ({ head, itemList, addNewItem, removeList, handleItemChange })
 
 
 
-const TableDataList = ({ item, removeList, handleItemChange }) => {
+const TableDataList = ({ item, removeList, handleItemChange, handleAdd, handleUpdateValue, cusList }) => {
     const [itemOptionList, setItemOptionList] = useState([]);
     const route = useRouter();
 
 
-    const handleItemNameChange = async (e) => {
-        const selectedItemId = e.target.value;
+    const handleItemNameChange = async (item) => {
+        console.log(item)
+        const selectedItemId = item?.item_code;
         const selectedOption = itemOptionList.find((option) => option.item_code === selectedItemId);
 
         const last_sale_price = await handleItemPrice(selectedItemId)
@@ -440,7 +444,7 @@ const TableDataList = ({ item, removeList, handleItemChange }) => {
         if (selectedOption) {
             const newItem = {
                 ...item,
-                itemName: selectedOption.item_code, // Set the item name based on the selected option
+                itemName: selectedOption.item_code,
                 rate: last_sale_price,
             };
             handleItemChange(newItem);
@@ -487,28 +491,54 @@ const TableDataList = ({ item, removeList, handleItemChange }) => {
         }
     }
 
+    const [supplierList, setSupplierList] = useState([])
+    async function fetchSupplierList() {
+        const res = await getSupplierList()
+
+        if (res?.data.length > 0) {
+
+            setSupplierList(res?.data)
+        }
+        else {
+            setSupplierList([])
+        }
+    }
+
     useEffect(() => {
         //    let salesItem= localStorage.getItem('saleItem')
         fetchItemList();
+        fetchSupplierList();
         // handleItemChange(salesItem)
     }, []);
 
     return (
-        <tr className="table-row table-row--chris">
+        <tr className="table-row table-row--chris" >
             <td data-column="Policy" className="table-row__td" style={{ maxWidth: '200px', width: '40%' }}>
                 <div className="table-row-input">
-                    <select
-                        value={item.itemName}
-                        onChange={handleItemNameChange}
-                        className="form-select"
-                    >
-                        <option value="">Select Any Item</option>
-                        {itemOptionList.length > 0 && itemOptionList.map((item) => (
-                            <option value={item.item_code} key={item.item_code}>
-                                {item.item_name}
-                            </option>
-                        ))}
-                    </select>
+                    <SearchCreateItem
+                        name={name}
+                        itemOptionList={itemOptionList}
+                        handleItemNameChange={handleItemNameChange}
+                        cusList={cusList}
+                        handleUpdateValue={handleUpdateValue}
+
+                        selectList={supplierList}
+                        handleAdd={handleAdd}
+                        handleAddNewItem={async (itemName, supplierName) => {
+                            console.log('itemName:', itemName)
+                            console.log('suppliername:', supplierName)
+                            const res = await addnewItem({ supplierName, itemName })
+                            if (res?.data) {
+
+                                handleItemNameChange({
+                                    item_name: res?.data.item_name,
+                                    item_code: res?.data?.item_code
+                                })
+                            }
+
+                        }}
+                    />
+
                 </div>
             </td>
 
@@ -541,7 +571,7 @@ const TableDataList = ({ item, removeList, handleItemChange }) => {
             <td className="table-row__td">
                 <div className="table-row__info" style={{ paddingLeft: '0px' }}>
                     <p className="table-row__name" >
-                        <i className="fa-solid fa-trash-can" onClick={() => removeList(item.uid)}></i>
+                        <i className="fa-solid fa-trash-can" onClick={() => removeList(item?.item_code)}></i>
                     </p>
                 </div>
             </td>

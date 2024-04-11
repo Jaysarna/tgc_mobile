@@ -23,8 +23,9 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type='number'] {
-  -moz-appearance: textfield;
+.table-row__td input[type='number'] {
+  height: 40px;
+  text-align: center;
 }
 
 /* ---Sidebar css */

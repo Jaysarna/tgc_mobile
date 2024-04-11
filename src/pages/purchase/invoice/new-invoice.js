@@ -10,8 +10,8 @@ import { handleError } from '@/Api/showError';
 import { handleItemPrice } from '@/features/item/getItemByItemCode';
 import { Autocomplete, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 import newitem from '@/pages/item/newitem';
-import SearchSelect from '@/helpers/SeachSelect';
-import addNewSupplier from '@/features/item/supplier/supplier.features';
+import SearchSelect from '@/customhook/autocomplete/SeachSelect';
+import addNewSupplier from '@/features/supplier/supplier.services';
 
 
 
@@ -80,7 +80,7 @@ const InvoiceData = () => {
             }
             return item;
         });
-        console.log(updatedItems2)
+
         setCustomerData({
             ...customerData,
             items: updatedItems2,
@@ -165,7 +165,7 @@ const InvoiceData = () => {
 
         try {
             let response1 = await axios.post(apiUrl, sampleRequestData, authHeader);
-            console.log('response 1 --------------', response1)
+
             if (response1 && !response1.data.data.custom_sample) {
 
                 var response = await axios.put(apiUrl + '/' + response1.data.data.name, {
@@ -174,7 +174,7 @@ const InvoiceData = () => {
                         "docstatus": 1
                     }
                 }, authHeader);
-                console.log('response  --------------', response)
+
             }
 
 
@@ -203,59 +203,7 @@ const InvoiceData = () => {
 
     const [newItem, setNewItem] = useState('');
 
-    // const handleNewItem = async (e) => {
-    //     e.preventDefault();
 
-    //     const apiUrl = 'https://tgc67.online/api/resource/Item';
-
-    //     const requestData = {
-    //         data: {
-    //             item_name: newItem,
-    //             item_group: 'Products',
-    //             stock_uom: 'Unit',
-    //             is_stock_item: '1',
-    //             supplier_items: [{
-    //                 supplier: customerData.supplier,
-    //             }]
-    //         },
-    //     };
-
-    //     try {
-    //         const response = await axios.post(apiUrl, requestData, authHeader);
-
-    //         if (response.statusText === 'OK') {
-    //             alert('New Item Added');
-    //             setNewItem('')
-    //             setUpdateSelectItem(!updateSelectItem)
-
-    //             //  console.log(response.data.data.item_code)
-
-    //             const newItem = {
-    //                 uid: uid(),
-    //                 itemCode: response.data.data.item_code,
-    //                 quantity: 1,
-    //                 rate: 0,
-    //             };
-    //             const updatedItems = [...customerData.items];
-    //             updatedItems[updatedItems.length - 1] = newItem;
-    //             setCustomerData({
-    //                 ...customerData,
-    //                 items: updatedItems,
-    //             });
-
-    //         }
-    //     } catch (error) {
-    //         handleError(error)
-    //         console.error('API Error:', error);
-    //         //  if (error.response.status === 403) {
-    //         //      alert("Login Expired")
-    //         //      route.push('/')
-    //         //  }
-    //         //  else {
-    //         //      handleError(error)
-    //         //  }
-    //     }
-    // }
     const [updateSelectItem, setUpdateSelectItem] = useState(false)
 
     const handleDocStatusCheckboxChange = (e) => {
@@ -266,15 +214,15 @@ const InvoiceData = () => {
     }
 
 
-    const handleUpdateValue = (event, value) => {
-        const newValue = value ? value.name : '';
+    const handleUpdateValue = (value) => {
+        console.log(value)
+        const newValue = (typeof value === 'object') ? value?.name : value;
+        console.log(newValue)
         setCustomerData({ ...customerData, supplier: newValue });
     };
 
 
-    async function handleAdd(updatedValue) {
 
-    }
 
     return (
         <>
@@ -312,7 +260,10 @@ const InvoiceData = () => {
                                                 handleUpdateValue={handleUpdateValue}
                                                 name="Supplier"
                                                 handleAdd={(updatedValue) => {
-                                                    console.log('=---------fireing', updatedValue)
+
+                                                    // console.log('=---------fireing', updatedValue)
+                                                    addNewSupplier({ supplierName: updatedValue })
+
                                                 }}
                                             />
                                         </div>
@@ -499,7 +450,7 @@ const TableDataList = ({ item, removeList, handleItemChange, updateSelectItem, c
         // }
         const newItem = {
             ...item,
-            itemCode: (typeof val === 'object' && val !== null) && val.value || val
+            itemCode: (typeof val === 'object' && val !== null) && val?.value || val
         };
 
 
@@ -674,7 +625,6 @@ const TableDataList = ({ item, removeList, handleItemChange, updateSelectItem, c
             <td data-column="Supplier" className="table-row__td">
                 <Autocomplete
                     value={
-
                         itemOptionList
                             ? (
                                 itemOptionList.find(option => option.item_code === item?.itemCode)
@@ -876,3 +826,58 @@ const TableDataList = ({ item, removeList, handleItemChange, updateSelectItem, c
     //     </div>
     // </div>
 */}
+
+
+// const handleNewItem = async (e) => {
+//     e.preventDefault();
+
+//     const apiUrl = 'https://tgc67.online/api/resource/Item';
+
+//     const requestData = {
+//         data: {
+//             item_name: newItem,
+//             item_group: 'Products',
+//             stock_uom: 'Unit',
+//             is_stock_item: '1',
+//             supplier_items: [{
+//                 supplier: customerData.supplier,
+//             }]
+//         },
+//     };
+
+//     try {
+//         const response = await axios.post(apiUrl, requestData, authHeader);
+
+//         if (response.statusText === 'OK') {
+//             alert('New Item Added');
+//             setNewItem('')
+//             setUpdateSelectItem(!updateSelectItem)
+
+//             //  console.log(response.data.data.item_code)
+
+//             const newItem = {
+//                 uid: uid(),
+//                 itemCode: response.data.data.item_code,
+//                 quantity: 1,
+//                 rate: 0,
+//             };
+//             const updatedItems = [...customerData.items];
+//             updatedItems[updatedItems.length - 1] = newItem;
+//             setCustomerData({
+//                 ...customerData,
+//                 items: updatedItems,
+//             });
+
+//         }
+//     } catch (error) {
+//         handleError(error)
+//         console.error('API Error:', error);
+//         //  if (error.response.status === 403) {
+//         //      alert("Login Expired")
+//         //      route.push('/')
+//         //  }
+//         //  else {
+//         //      handleError(error)
+//         //  }
+//     }
+// }
