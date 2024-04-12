@@ -121,7 +121,7 @@ const Login = () => {
                 <div className=" d-flex justify-content-center">
 
                   {/* <Image src={logo} alt="Logo" width={150} height={150} /> */}
-                  <img src={'/logo.jpg'} alt="Logo" width={150} height={150} />
+                  <Image src={'/logo.jpg'} alt="Logo" width={150} height={150} />
 
 
                 </div>
