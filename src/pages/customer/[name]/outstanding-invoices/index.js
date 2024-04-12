@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import ListDesign from '@/helpers/ListDesign'
 // import './customerList.module.css';
 import Siderbar from '@/helpers/siderbar'
 import withAuth from '@/customhook/withAuth'
@@ -17,7 +16,7 @@ const outstandingInvoices = () => {
 
   const [tableData, setTableData] = useState([])
 
-  async function fetchOutstanding (name) {
+  async function fetchOutstanding(name) {
     const authHeader = getAuthHeader()
     const apiUrl = 'https://tgc67.online/api/resource/Sales%20Invoice'
     const filters = [
@@ -150,17 +149,17 @@ const DataTable = ({ tableData, head }) => {
 
 const TableDataList = ({ amount, name, customer, total }) => {
   const route = useRouter()
-  async function handlePay (name, customer) {
+  async function handlePay(name, customer) {
     route.push(
       '/customer/' +
-        customer +
-        '/outstanding-invoices/' +
-        name +
-        '/recieve-a-payment'
+      customer +
+      '/outstanding-invoices/' +
+      name +
+      '/recieve-a-payment'
     )
   }
 
-  async function handleView (name, customer) {
+  async function handleView(name, customer) {
     route.push(
       '/customer/' + customer + '/outstanding-invoices/' + name + '/view'
     )

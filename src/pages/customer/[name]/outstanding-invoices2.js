@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import ListDesign from '@/helpers/ListDesign'
 // import './customerList.module.css';
 import Siderbar from '@/helpers/siderbar'
 import withAuth from '@/customhook/withAuth'
 import axios from 'axios'
-import { authHeader, getAuthHeader } from '@/helpers/Header'
+import { getAuthHeader } from '@/helpers/Header'
 import { useRouter } from 'next/router'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
@@ -68,7 +67,7 @@ const outstandingInvoices = () => {
   //     }
   //   }
 
-  async function fetchOutstanding (name) {
+  async function fetchOutstanding(name) {
     const authHeader = getAuthHeader()
 
     var requestOptions = {
@@ -182,7 +181,7 @@ const DataTable = ({ tableData, head }) => {
 
 const TableDataList = ({ amount, name, customer, total }) => {
   const route = useRouter()
-  async function handleEdit (name) {
+  async function handleEdit(name) {
     route.push('/customer/' + name + '/edit')
   }
 

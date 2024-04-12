@@ -23,6 +23,7 @@
     "react-hot-toast": "^2.4.1",
     "react-notifications-component": "^4.0.1",
     "react-pro-sidebar": "^1.1.0-alpha.1",
+    "sass": "^1.75.0",
     "sharp": "^0.32.6",
     "uid": "^2.0.2"
   }

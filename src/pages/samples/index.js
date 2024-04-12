@@ -7,9 +7,12 @@ import { LoadingPage } from "@/helpers/Loader";
 import axios from "axios";
 import moment from "moment";
 import { useRouter } from "next/router";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import Head from "next/head";
+
 
 const Index = () => {
-    const [supplerList, setSupplierList] = useState([]);
+    const [sampleList, setSampleList] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const router = useRouter()
@@ -114,7 +117,7 @@ const Index = () => {
                     throw new Error("Failed to fetch data");
                 }
 
-                setSupplierList(response.data.message || []);
+                setSampleList(response.data.message || []);
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -125,16 +128,83 @@ const Index = () => {
         fetchData();
     }, []);
 
+    const [filterType, setFilterType] = useState("supplier");
+
+    const handleSupplierSamplesClick = () => {
+        setFilterType("supplier");
+    };
+
+    const handleCustomerSamplesClick = () => {
+        setFilterType("customer");
+    };
+
+
+    const toggleFilterType = (type) => {
+        if (filterType === type) {
+            setFilterType("all");
+        } else {
+            setFilterType(type);
+        }
+    };
+
+    const filteredSampleList = sampleList.filter(sample => {
+        if (filterType === "supplier") {
+            return sample.parenttype === "Purchase Invoice";
+        } else if (filterType === "customer") {
+            return sample.parenttype === "Sales Invoice";
+        }
+        return true;
+    });
+
+
+
     return (
         <>
+            <Head>
+                <title>Sample List</title>
+            </Head>
             <Siderbar />
             <div className="container-2">
                 {loading ? (
                     <LoadingPage msg="Loading" />
                 ) : (
                     <MUIDataTable
-                        title="Samples "
-                        data={supplerList}
+                        // title="Samples "
+                        title={
+                            <>
+
+                                <h6 className='row__title p-3 d-flex align-items-center'>
+                                    <div
+                                        className='p-2'
+                                        onClick={() => {
+                                            router.push('/main')
+                                        }}
+                                    >
+                                        <ArrowBackIcon className='' />
+                                    </div>
+                                    <div className='col-md-5'>
+                                        Sample List{' '}
+                                        <span className='span-user-clr'>
+                                            {sampleList && sampleList.length}{' '}
+                                        </span>
+                                    </div>
+
+
+
+                                </h6>
+                                <div className='col-12 d-flex header-btn-outer'>
+                                    <button className={`btn btn-primary supplier-btn ${filterType === 'supplier' ? 'active' : ''}`} onClick={() => toggleFilterType('supplier')}>
+                                        Samples taken from suppliers
+                                    </button>
+                                    <button className={`btn btn-primary supplier-btn ${filterType === 'customer' ? 'active' : ''}`} onClick={() => toggleFilterType('customer')}>
+                                        Samples given to customer
+                                    </button>
+
+                                </div>
+                            </>
+                        }
+                        // data={sampleList}
+                        data={filteredSampleList}
                         columns={columns}
                         options={{
                             filterType: 'dropdown',

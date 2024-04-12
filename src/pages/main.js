@@ -4,6 +4,7 @@ import axios from "axios";
 import withAuth from "@/customhook/withAuth";
 import { handleError } from "@/Api/showError";
 import { useRouter } from "next/router";
+import Head from "next/head";
 
 
 const apiUrl = 'https://tgc67.online/api/method/number_card';
@@ -55,6 +56,9 @@ const Main = () => {
 
     return (
         <>
+            <Head>
+                <title>TGC APP</title>
+            </Head>
             <Siderbar />
             <div className="card-container main-item-card-outer">
 

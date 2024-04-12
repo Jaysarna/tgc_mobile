@@ -9,6 +9,7 @@ import { Pagination } from '@/customhook/pagination';
 import { authHeader, getAuthHeader } from '@/helpers/Header';
 import { handleError } from '@/Api/showError';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import Head from 'next/head';
 
 const ItemList = () => {
     const [tableData, setTableData] = useState([]);
@@ -68,28 +69,30 @@ const DataTable = ({ tableData }) => {
 
     const columns = [
         {
-            name: 'customer',
-            options: {
-                display: false
-            }
-        },
-        {
             name: 'name',
             label: 'Customer Name',
             options: {
 
                 customBodyRender: (value, tableMeta) => {
-                    const name = tableMeta.rowData[0]
+                    const name = tableMeta.rowData[1]
 
                     return (
                         < div className='table-row__info' >
-                            <p className='table-row__name'>{value}</p>
-                            <span className='table-row__small ms-1'>{name}</span>
+                            <p className='table-row__name'>{name}</p>
+                            <span className='table-row__small ms-1'>{value}</span>
                         </div >
                     )
                 }
             }
         },
+        {
+            name: 'customer',
+            label: 'Customer',
+            // options: {
+            //     display: false
+            // }
+        },
+
 
 
 
@@ -119,8 +122,8 @@ const DataTable = ({ tableData }) => {
             label: 'Return',
             options: {
                 customBodyRender: (dataIndex, tableMeta) => {
-                    const name = tableMeta.rowData[0]
-                    const invoice = tableMeta.rowData[1]
+                    const name = tableMeta.rowData[1]
+                    const invoice = tableMeta.rowData[0]
                     return (
                         <button className="btn btn-primary" onClick={() => {
                             router.push(`/sales/invoice/${invoice}/${name}/return`)
@@ -155,25 +158,30 @@ const DataTable = ({ tableData }) => {
     };
 
     return (
-        <div className='table-vw-size mbvw-tbl-scrl'>
-            <MUIDataTable
-                title={
-                    <div className="container row p-3">
-                        <h6 className='row__title p-3 d-flex align-items-center'>
-                            <div
-                                className='p-2'
-                                onClick={() => {
-                                    router.push('/main')
-                                }}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                <ArrowBackIcon className='' />
-                            </div>
-                            <div className='col-md-8'>
-                                All Sales Invoice List{' '}
-                                <span className='span-user-clr'>{tableData.length}</span>
-                            </div>
-                            {/* <div className='col-md-3'>
+        <>
+            <Head>
+                <title>Sales Invoice List</title>
+            </Head>
+            <div className='table-vw-size mbvw-tbl-scrl'>
+
+                <MUIDataTable
+                    title={
+                        <div className="container row p-3">
+                            <h6 className='row__title p-3 d-flex align-items-center'>
+                                <div
+                                    className='p-2'
+                                    onClick={() => {
+                                        router.push('/main')
+                                    }}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <ArrowBackIcon className='' />
+                                </div>
+                                <div className='col-md-8'>
+                                    All Sales Invoice List{' '}
+                                    <span className='span-user-clr'>{tableData.length}</span>
+                                </div>
+                                {/* <div className='col-md-3'>
                                 <div className='form-check'>
                                     <input
                                         type='checkbox'
@@ -192,26 +200,27 @@ const DataTable = ({ tableData }) => {
                                     </strong>
                                 </div>
                             </div> */}
-                            <div className='col-6'>
-                                Total Amount{' '}
-                                <span className='span-user-clr'>
-                                    {'$ '}
-                                    {tableData.length > 0
-                                        ? tableData.reduce(
-                                            (total, item) => total + item.outstanding_amount,
-                                            0
-                                        )
-                                        : 0}
-                                </span>
-                            </div>
-                        </h6>
-                    </div>
-                }
-                data={tableData}
-                columns={columns}
-                options={options}
-            />
-            {/* <Pagination /> */}
-        </div>
+                                <div className='col-6'>
+                                    Total Amount{' '}
+                                    <span className='span-user-clr'>
+                                        {'$ '}
+                                        {tableData.length > 0
+                                            ? tableData.reduce(
+                                                (total, item) => total + item.outstanding_amount,
+                                                0
+                                            )
+                                            : 0}
+                                    </span>
+                                </div>
+                            </h6>
+                        </div>
+                    }
+                    data={tableData}
+                    columns={columns}
+                    options={options}
+                />
+                {/* <Pagination /> */}
+            </div>
+        </>
     );
 };

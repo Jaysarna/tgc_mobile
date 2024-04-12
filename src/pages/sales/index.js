@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-// import ListDesign from '../../helpers/ListDesign';
 // import './customerList.module.css';
 import Siderbar from '../../helpers/siderbar';
 import withAuth from '@/customhook/withAuth';

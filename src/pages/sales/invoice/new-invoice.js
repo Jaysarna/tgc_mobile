@@ -14,6 +14,7 @@ import SearchCreateItem from '@/customhook/autocomplete/SearchCreateItem';
 import addnewItem from '@/features/item/item.services';
 import { getSupplierList } from '@/features/supplier/supplier.services';
 import { uid } from 'uid';
+import Head from 'next/head';
 
 
 let name = "Customer"
@@ -226,6 +227,9 @@ const InvoiceData = () => {
 
     return (
         <>
+            <Head>
+                <title>New Sales Invoice </title>
+            </Head>
 
             {isLoading &&
                 <LoadingPage
