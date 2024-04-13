@@ -7,6 +7,8 @@ import { uid } from 'uid';
 import withAuth from '@/customhook/withAuth';
 import { handleError } from '@/Api/showError';
 import { LoadingPage } from '@/helpers/Loader';
+import { CreateNewPurchaseInvoice, updatePurchaseInvoice } from '@/features/purchase/purchase.services';
+import Head from 'next/head';
 
 
 
@@ -29,8 +31,8 @@ const InvoiceData = () => {
 
     const { name, invoice } = route.query;
 
-    const [customerData, setCustomerData] = useState({
-        customerName: '',
+    const [supplierData, setSupplierData] = useState({
+        supplierName: '',
         postingDate: new Date().toISOString().substr(0, 10),
         dueDate: new Date().toISOString().substr(0, 10),
         docStatus: 1,
@@ -55,14 +57,14 @@ const InvoiceData = () => {
             amount: 0,
         };
         // Create a copy of the current items array
-        const updatedItems = [...customerData.items];
+        const updatedItems = [...supplierData.items];
 
 
         updatedItems.push(newItem);
 
 
-        setCustomerData({
-            ...customerData,
+        setSupplierData({
+            ...supplierData,
             items: updatedItems,
         });
 
@@ -71,11 +73,11 @@ const InvoiceData = () => {
     const removeList = (itemNameToFilter) => {
         // console.log(itemNameToFilter)
 
-        const filteredItems = customerData.items.filter(item => item.uid !== itemNameToFilter);
+        const filteredItems = supplierData.items.filter(item => item.uid !== itemNameToFilter);
 
 
-        setCustomerData({
-            ...customerData,
+        setSupplierData({
+            ...supplierData,
             items: filteredItems,
         });
         // console.log(customerData.items)
@@ -84,14 +86,14 @@ const InvoiceData = () => {
 
     function handleItemChange(updatedItem) {
 
-        const updatedItems2 = customerData.items.map((item) => {
+        const updatedItems2 = supplierData.items.map((item) => {
             if (item.uid === updatedItem.uid) {
                 return updatedItem;
             }
             return item;
         });
-        setCustomerData({
-            ...customerData,
+        setSupplierData({
+            ...supplierData,
             items: updatedItems2
         });
 
@@ -102,11 +104,11 @@ const InvoiceData = () => {
     const [cusList, setCusList] = useState([])
 
 
-    const handleAddCustomer = async (e) => {
+    const handleUpdateSample = async (e) => {
         e.preventDefault();
         setIsLoading(true)
 
-        const apiUrl = 'https://tgc67.online/api/resource/Purchase%20Invoice/' + invoice;
+        // const apiUrl = 'https://tgc67.online/api/resource/Purchase%20Invoice/' + invoice;
 
 
         function buildItemsArray(jsonItems) {
@@ -120,31 +122,19 @@ const InvoiceData = () => {
 
         const requestData = {
             data: {
-                "customer": customerData.customerName,
-                "docstatus": customerData.docStatus,
+                "supplier": supplierData.supplierName,
+                "docstatus": supplierData.docStatus,
                 "update_stock": "1",
-                "due_date": customerData.dueDate,
-                "items": buildItemsArray(customerData.items),
+                "due_date": supplierData.dueDate,
+                "items": buildItemsArray(supplierData.items),
 
             },
         };
         try {
-            const response = await axios.put(apiUrl, requestData, authHeader)
-
-
-            if (response.statusText === 'OK') {
-                alert("Invoice Updated Successfully")
-                route.push('/supplier')
-            }
-            // console.log('API Response:', response.statusText)
+            const response = updatePurchaseInvoice(invoice)
         } catch (error) {
             console.log(error)
-            if (error.response.status === 403) {
-                sessionStorage.clear()
-            }
-            else {
-                handleError(error)
-            }
+
         }
         setIsLoading(false)
     };
@@ -170,9 +160,9 @@ const InvoiceData = () => {
             ))
 
 
-            setCustomerData({
-                ...customerData,
-                customerName: customer,
+            setSupplierData({
+                ...supplierData,
+                supplierName: customer,
                 items: updatedItems
             })
         }
@@ -185,8 +175,8 @@ const InvoiceData = () => {
 
 
     const handlePostingDateChange = (e) => {
-        setCustomerData({
-            ...customerData,
+        setSupplierData({
+            ...supplierData,
             postingDate: e.target.value,
         });
     };
@@ -207,6 +197,9 @@ const InvoiceData = () => {
 
     return (
         <>
+            <Head>
+                <title>Update Sample to Invoice</title>
+            </Head>
             <Siderbar />
 
             {isLoading &&
@@ -232,7 +225,7 @@ const InvoiceData = () => {
                                         </div>
                                     </div>
 
-                                    <form onSubmit={handleAddCustomer} method="post" className="row g-3 needs-validation">
+                                    <form onSubmit={handleUpdateSample} method="post" className="row g-3 needs-validation">
                                         <div className="col-12">
                                             <label htmlFor="customerName" className="form-label">Supplier Name</label>
                                             <div className="has-validation">
@@ -241,7 +234,7 @@ const InvoiceData = () => {
                                                     name="customerName"
                                                     className="form-control"
                                                     id="customerName"
-                                                    value={customerData.customerName}
+                                                    value={supplierData.supplierName}
                                                     readOnly
                                                 // onChange={handlePostingDateChange}
                                                 />
@@ -255,7 +248,7 @@ const InvoiceData = () => {
                                                 name="postingDate"
                                                 className="form-control"
                                                 id="postingDate"
-                                                value={customerData.postingDate}
+                                                value={supplierData.postingDate}
                                                 onChange={handlePostingDateChange}
                                             />
                                         </div>
@@ -271,7 +264,7 @@ const InvoiceData = () => {
                                                 "Amount",
                                             ]}
                                             title='Customer'
-                                            itemList={customerData.items}
+                                            itemList={supplierData.items}
                                             addNewItem={addNewItem}
                                             removeList={removeList}
                                             handleItemChange={handleItemChange}

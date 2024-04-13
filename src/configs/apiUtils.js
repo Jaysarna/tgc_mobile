@@ -1,3 +1,4 @@
+import { handleShowApiError } from '@/features/error/getErrorApi';
 import { getAuthHeader } from '@/helpers/Header';
 import axios from 'axios';
 
@@ -29,6 +30,7 @@ api.interceptors.request.use(config => {
 });
 
 const handleApiError = error => {
+    handleShowApiError(error)
     if (error.response) {
         console.error('API Error:', error.response.status, error.response.data);
         if (error.response.data && error.response.data.error) {

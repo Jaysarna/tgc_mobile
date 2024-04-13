@@ -18,12 +18,14 @@ const ItemList = () => {
         const apiUrl = 'https://tgc67.online/api/resource/Purchase%20Invoice';
         const filters = [
             ['docstatus', '=', '1'],
-            ['status', '!=', 'Cancel']
+            ['status', '!=', 'Cancel'],
+
         ];
-        const fields = ['name', 'supplier', 'grand_total', 'outstanding_amount', 'posting_date'];
+        const fields = ['name', 'supplier', 'grand_total', 'outstanding_amount', 'posting_date',];
+        const orderBy = "creation desc";
 
         // Construct the dynamic URL
-        const url = `${apiUrl}?filters=${encodeURIComponent(JSON.stringify(filters))}&fields=${encodeURIComponent(JSON.stringify(fields))}`;
+        const url = `${apiUrl}?filters=${encodeURIComponent(JSON.stringify(filters))}&fields=${encodeURIComponent(JSON.stringify(fields))}&order_by=${orderBy}`;
 
         try {
             const listRes = await axios.get(url, authHeader)
@@ -80,8 +82,8 @@ const DataTable = ({ tableData }) => {
                         < div className='table-row__info' style={{ cursor: 'pointer' }} onClick={() => {
                             router.push(`/purchase/invoice/view/${value}`)
                         }}>
-                            <p className='table-row__name'>{value}</p>
-                            <span className='table-row__small ms-1'>{name}</span>
+                            <p className='table-row__name'>{name}</p>
+                            <span className='table-row__small ms-1'>{value}</span>
                         </div >
                     )
                 }

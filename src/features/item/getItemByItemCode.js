@@ -1,6 +1,7 @@
 import { handleError } from "@/Api/showError";
 import { getAuthHeader } from "@/helpers/Header";
 import axios from "axios";
+import { handleShowApiError } from "../error/getErrorApi";
 
 
 
@@ -25,16 +26,7 @@ async function handleItemPrice(code) {
         return price
     }
     catch (err) {
-        console.log(err)
-        if (err.response.status === 403) {
-            sessionStorage.clear()
-        }
-        else {
-            // handleError(err)
-            console.log(err)
-        }
-
-
+        handleShowApiError(err)
     }
 }
 

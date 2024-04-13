@@ -11,10 +11,11 @@ import { LoadingPage } from '@/helpers/Loader';
 import addNewCustomer from '@/features/customer/customer.services';
 import SearchSelect from '@/customhook/autocomplete/SeachSelect';
 import SearchCreateItem from '@/customhook/autocomplete/SearchCreateItem';
-import addnewItem from '@/features/item/item.services';
+import addnewItem, { addNewItemWithoutSupplier } from '@/features/item/item.services';
 import { getSupplierList } from '@/features/supplier/supplier.services';
 import { uid } from 'uid';
 import Head from 'next/head';
+import { handleShowApiError } from '@/features/error/getErrorApi';
 
 
 let name = "Customer"
@@ -155,7 +156,7 @@ const InvoiceData = () => {
             }
             // console.log('API Response:', response.statusText)
         } catch (err) {
-
+            handleShowApiError(err)
             handleError(err)
             console.error('API Error:', err);
         }
@@ -448,7 +449,7 @@ const TableDataList = ({ item, removeList, handleItemChange, handleAdd, handleUp
 
         const last_sale_price = await handleItemPrice(selectedItemId)
 
-        console.log(selectedOption)
+        // console.log(selectedOption)
 
         if (selectedOption) {
             const newItem = {
@@ -517,7 +518,6 @@ const TableDataList = ({ item, removeList, handleItemChange, handleAdd, handleUp
     }
 
     useEffect(() => {
-        //    let salesItem= localStorage.getItem('saleItem')
         fetchItemList();
         fetchSupplierList();
         // handleItemChange(salesItem)
@@ -541,7 +541,8 @@ const TableDataList = ({ item, removeList, handleItemChange, handleAdd, handleUp
                         handleAddNewItem={async (itemName, supplierName) => {
                             console.log('itemName:', itemName)
                             console.log('suppliername:', supplierName)
-                            const res = await addnewItem({ supplierName, itemName })
+
+                            const res = await addNewItemWithoutSupplier({ itemName })
                             if (res?.data) {
 
                                 handleItemNameChange({

@@ -2,6 +2,7 @@
 import { toast } from 'react-hot-toast';
 import { get, post } from '@/configs/apiUtils';
 import { useRouter } from 'next/router';
+import { handleShowApiError } from '../error/getErrorApi';
 
 const addNewSupplier = async (
     {
@@ -33,7 +34,7 @@ const addNewSupplier = async (
             {
                 loading: 'Adding new supplier...',
                 success: (res) => res?.data.name ? 'New Supplier Added Successfully' : 'Failed to add new supplier. Please try again.',
-                error: 'Failed to add new supplier. Please try again.',
+                // error: 'Failed to add new supplier. Please try again.',
 
 
             },
@@ -41,19 +42,8 @@ const addNewSupplier = async (
         )
 
     } catch (error) {
-        console.log(error);
 
-        if (error.response && error.response.status === 403) {
-            sessionStorage.clear();
-            alert('Login Expired');
-            window.location.replace('/')
-        } else {
-            console.log(error)
-        }
-
-        toast.error('Please Try Again');
-    } finally {
-        console.log('end of new supplier')
+        handleShowApiError(error)
     }
 };
 
@@ -85,8 +75,7 @@ export const getSupplierList = async () => {
         const res = await get('resource/Supplier');
         return res
     } catch (err) {
-        // console.log('fired')
-        console.log(err)
+        handleShowApiError(err)
     }
 }
 

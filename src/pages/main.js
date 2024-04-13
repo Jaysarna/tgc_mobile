@@ -9,8 +9,6 @@ import Head from "next/head";
 
 const apiUrl = 'https://tgc67.online/api/method/number_card';
 
-
-
 const symbol = [
     "+",
     "+",

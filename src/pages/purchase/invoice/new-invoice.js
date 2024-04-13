@@ -119,7 +119,7 @@ const InvoiceData = () => {
     }
 
 
-    const handleAddSupplier = async (e) => {
+    const handAddnewPurchaseInvoice = async (e) => {
         setLoading(true)
         e.preventDefault();
 
@@ -142,23 +142,7 @@ const InvoiceData = () => {
                 })),
             },
         };
-        // const requestData = {
-        //     data: {
-        //         "supplier": customerData.supplier,
-        //         "set_warehouse": "Warehouse 1 - TGC",
-        //         // "expense_account": 'Stock In Hand - TGC',
-        //         "custom_payment_amount_in_advance": customerData.paymentAmountInAdvance,
-        //         "update_stock": "1",
-        //         "docstatus": 1,
-        //         "custom_sample": !(customerData.docStatus),
-        //         "items": customerData.items.map((item) => ({
-        //             "item_code": item.itemCode,
-        //             "qty": item.quantity,
-        //             "rate": item.rate,
-        //             "warehouse": "Warehouse 1 - TGC",
-        //         })),
-        //     },
-        // };
+
 
 
 
@@ -252,7 +236,7 @@ const InvoiceData = () => {
                                             <i className="fa-solid fa-xmark"></i>
                                         </div>
                                     </div>
-                                    <form onSubmit={handleAddSupplier} method="post" className="row g-3 needs-validation">
+                                    <form onSubmit={handAddnewPurchaseInvoice} method="post" className="row g-3 needs-validation">
 
                                         <div className='col-12 mb-4'>
                                             <SearchSelect
@@ -265,6 +249,7 @@ const InvoiceData = () => {
                                                     addNewSupplier({ supplierName: updatedValue })
 
                                                 }}
+
                                             />
                                         </div>
 

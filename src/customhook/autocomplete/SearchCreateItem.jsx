@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { TextField, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import SearchSelect from './SeachSelect';
+import { addNewItemWithoutSupplier } from '@/features/item/item.services';
 
 export default function SearchCreateItem({ selectList, uid, quantity, handleAddNewItem, cusList, handleItemNameChange, handleUpdateValue, name, handleAdd, itemOptionList }) {
     const [openDialog, setOpenDialog] = useState(false);
