@@ -199,8 +199,8 @@ const ContextMenu = () => {
                         <li onClick={() => handleRoutePage('/sales/invoice/new-invoice')}>Create Sales Invoice</li>
                         {/* // <li onClick={() => handleRoutePage('/main')}>Main Dashboard</li> */}
                         {/* <li onClick={() => handleRoutePage('/main')}>Sales Dashboard</li> */}
-                        {/* // <li onClick={() => handleRoutePage('/payment/make-a-payment')}>Make a Payment</li>*/}
-                        {/*// <li onClick={() => handleRoutePage('/payment/recieve-a-payment')}>Receive a Payment</li>*/}
+                        <li onClick={() => handleRoutePage('/payment/make-a-payment')}>Make a Payment</li>
+                        <li onClick={() => handleRoutePage('/payment/recieve-a-payment')}>Receive a Payment</li>
                         {/* <li onClick={() => handleRoutePage('/journal-entry')}>Journal Entry</li> */}
                     </section>
 

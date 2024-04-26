@@ -60,12 +60,12 @@ export default function SearchCreateItem({ selectList, uid, quantity, handleAddN
                 filterOptions={(options, params) => {
                     const filtered = filter(options, params);
 
-                    if (params.inputValue !== '') {
-                        filtered.push({
-                            inputValue: params.inputValue,
-                            item_name: `Add "${params.inputValue}"`,
-                        });
-                    }
+                    // if (params.inputValue !== '') {
+                    //     filtered.push({
+                    //         inputValue: params.inputValue,
+                    //         item_name: `Add "${params.inputValue}"`,
+                    //     });
+                    // }
 
                     return filtered;
                 }}

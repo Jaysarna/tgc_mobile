@@ -16,6 +16,8 @@ import { getSupplierList } from '@/features/supplier/supplier.services';
 import { uid } from 'uid';
 import Head from 'next/head';
 import { handleShowApiError } from '@/features/error/getErrorApi';
+import { Autocomplete } from '@mui/material';
+import toast from 'react-hot-toast';
 
 
 let name = "Customer"
@@ -150,14 +152,15 @@ const InvoiceData = () => {
             console.log(response)
 
             if (response.statusText === 'OK') {
-                alert("Invoice Created Successfully")
+                // alert("Invoice Created Successfully")
+                toast.success("Invoice Created Successfully")
                 route.push('/main')
                 localStorage.clear()
             }
             // console.log('API Response:', response.statusText)
         } catch (err) {
             handleShowApiError(err)
-            handleError(err)
+            // handleError(err)
             console.error('API Error:', err);
         }
         setLoading(false)
@@ -178,6 +181,7 @@ const InvoiceData = () => {
             if (err.response.status === 403) {
                 sessionStorage.clear()
                 alert("Login Expired")
+                toast.error("Login Expired")
                 route.push('/')
             }
             else {
@@ -555,6 +559,14 @@ const TableDataList = ({ item, removeList, handleItemChange, handleAdd, handleUp
 
                         }}
                     />
+                    {/* <Autocomplete
+                        disablePortal
+                        id="combo-box-demo"
+                        options={itemOptionList}
+                        sx={{ width: '100%' }}
+                        renderInput={(params) => <TextField {...params} label="Select Item" />}
+                    /> */}
+
 
                 </div>
             </td>

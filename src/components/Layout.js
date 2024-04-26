@@ -7,10 +7,9 @@ const Layout = ({ children }) => {
         <div>
 
             <Toaster
-                position="top-right"
-                autoClose={3000}
+                position="top-center"
+                autoClose={4000}
                 closeOnClick
-
             />
             {children}
         </div>
