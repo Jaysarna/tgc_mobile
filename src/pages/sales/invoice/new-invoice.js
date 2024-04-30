@@ -144,7 +144,7 @@ const InvoiceData = () => {
                 "items": buildItemsArray(customerData.items),
                 "custom_sample": !(customerData.docStatus),
                 "set_warehouse": "Warehouse 1 - TGC",
-                "advance_recieved": parseFloat(customerData.advance_recieved),
+                "advance_received": parseFloat(customerData.advance_recieved),
             },
         };
 
