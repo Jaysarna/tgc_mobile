@@ -39,6 +39,7 @@ const InvoiceData = () => {
         postingDate: new Date().toISOString().substr(0, 10), // Set to today's date
         dueDate: new Date(new Date().getTime() + 10 * 24 * 60 * 60 * 1000).toISOString().substr(0, 10), // Set dueDate 10 days ahead of postingDate
         docStatus: 1,
+        advance_recieved: 0,
         custom_sample: 0,
         items: [{
             uid: uid(),
@@ -263,7 +264,7 @@ const InvoiceData = () => {
                                     <form onSubmit={handleAddCustomer} method="post" className="row g-3 needs-validation">
 
 
-                                        <div className='col-12 mb-4'>
+                                        <div className='col-12 mb-2'>
                                             <SearchSelect
                                                 cusList={cusList}
                                                 handleUpdateValue={handleUpdateValue}
@@ -273,7 +274,7 @@ const InvoiceData = () => {
                                                 }}
                                             />
                                         </div>
-                                        <div className="col-12 mb-4">
+                                        <div className="col-12 mb-2">
                                             <label htmlFor="postingDate" className="form-label">Posting Date</label>
                                             <input
                                                 type="date"
@@ -284,7 +285,7 @@ const InvoiceData = () => {
                                                 onChange={handlePostingDateChange}
                                             />
                                         </div>
-                                        <div className="col-12 mb-4">
+                                        <div className="col-12 mb-2">
                                             <label htmlFor="dueDate" className="form-label">Due Date</label>
                                             <input
                                                 type="date"
@@ -293,6 +294,23 @@ const InvoiceData = () => {
                                                 id="dueDate"
                                                 value={customerData.dueDate}
                                                 onChange={handleDueDateChange}
+
+                                            />
+                                        </div>
+                                        <div className="col-12 mb-2">
+                                            <label htmlFor="advanceRecieved" className="form-label">Advance Recieved</label>
+                                            <input
+                                                type="number"
+                                                name="advance_recieved"
+                                                className="form-control"
+                                                id="advance_recieved"
+                                                value={customerData.advance_recieved}
+                                                onChange={(e) => {
+                                                    setCustomerData({
+                                                        ...customerData,
+                                                        advance_recieved: e.target.value,
+                                                    });
+                                                }}
 
                                             />
                                         </div>
