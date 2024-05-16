@@ -59,7 +59,7 @@ const view = () => {
                 }
             }
         }
-       
+
 
     }
 
@@ -198,7 +198,7 @@ const DataTable = ({ head, itemList, removeList, handleItemChange }) => {
     useEffect(() => {
         // console.log(itemList)
         setTotalAmount(itemList.reduce((total, item) => total + item.base_rate * item.qty, 0))
-        setTotalQuan(itemList.reduce((total, item) => total + item.qty, 0))
+        setTotalQuan(itemList.reduce((total, item) => parseFloat(total) + parseFloat(item.qty), 0))
     }, [itemList])
 
     return (

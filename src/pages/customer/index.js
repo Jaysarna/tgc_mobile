@@ -91,7 +91,7 @@ const DataTable = () => {
             { name: 'Outstanding Amount', label: 'Outstanding Amount' },
 
             {
-                name: 'Create',
+                name: 'Make Payment',
                 filter: false,
                 // options: { customBodyRender: () => <AddIcon className='plus-icon-btn' onClick={() => route.push(`/customer/${item[0]}/recive-payment`)} /> }
             },
@@ -105,7 +105,7 @@ const DataTable = () => {
         ]
         : [
             { name: 'Customer Name', label: 'Customer Name' },
-            { name: 'Sample', label: 'Label' },
+            { name: 'Make Payment', label: 'Label' },
             { name: 'creation', label: 'Date' },
         ];
 

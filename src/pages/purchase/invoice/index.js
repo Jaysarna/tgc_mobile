@@ -8,6 +8,7 @@ import MUIDataTable from 'mui-datatables';
 import { authHeader, getAuthHeader } from '@/helpers/Header';
 import { handleError } from '@/Api/showError';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { AddIcon } from '@/icons/actions';
 
 const ItemList = () => {
     const [tableData, setTableData] = useState([]);
@@ -21,7 +22,7 @@ const ItemList = () => {
             ['status', '!=', 'Cancel'],
 
         ];
-        const fields = ['name', 'supplier', 'grand_total', 'outstanding_amount', 'posting_date',];
+        const fields = ['name', 'supplier', 'grand_total', 'outstanding_amount', 'posting_date', 'is_return'];
         const orderBy = "creation desc";
 
         // Construct the dynamic URL
@@ -70,6 +71,7 @@ const DataTable = ({ tableData }) => {
                 display: false
             }
         },
+
         {
             name: 'name',
             label: 'Supplier Name',
@@ -89,7 +91,13 @@ const DataTable = ({ tableData }) => {
                 }
             }
         },
+        {
+            name: 'is_return',
+            options: {
+                display: false,
 
+            }
+        },
 
 
         {
@@ -114,17 +122,43 @@ const DataTable = ({ tableData }) => {
             }
         },
         {
+            name: 'payment',
+            label: 'Make a Payment',
+            options: {
+                customBodyRender: (dataIndex, tableMeta) => {
+                    const name = tableMeta.rowData[0]
+                    return (
+                        <AddIcon
+                            className="plus-icon-btn"
+                            onClick={() => router.push(`/supplier/${name}/make-payment`)}
+                        />
+                    )
+                }
+            }
+        },
+        {
             name: 'Return',
             label: 'Return',
             options: {
                 customBodyRender: (dataIndex, tableMeta) => {
                     const name = tableMeta.rowData[0]
                     const invoice = tableMeta.rowData[1]
-                    return (
-                        <button className="btn btn-primary" onClick={() => {
-                            router.push(`/purchase/invoice/${invoice}/${name}/return`)
-                        }}>Return</button>
-                    )
+                    const is_return = tableMeta.rowData[2]
+                    if (!is_return) {
+
+                        return (
+                            <button className="btn btn-primary" onClick={() => {
+                                router.push(`/purchase/invoice/${invoice}/${name}/return`)
+                            }}>Return</button>
+                        )
+                    }
+                    else {
+                        return (
+                            <>
+                                --
+                            </>
+                        )
+                    }
 
                 }
             }

@@ -376,7 +376,7 @@ const DataTable = ({ head, itemList, addNewItem, removeList, handleItemChange, h
     useEffect(() => {
         // console.log(itemList)
         setTotalAmount(itemList.reduce((total, item) => total + item.rate * item.quantity, 0))
-        setTotalQuan(itemList.reduce((total, item) => total + item.quantity, 0))
+        setTotalQuan(itemList.reduce((total, item) => parseFloat(total) + parseFloat(item.quantity), 0))
     }, [itemList])
 
     return (
@@ -442,7 +442,7 @@ const DataTable = ({ head, itemList, addNewItem, removeList, handleItemChange, h
                                 <input
                                     type="number"
                                     className='form-control'
-                                    value={totalQuan}
+                                    value={parseFloat(totalQuan)}
                                     placeholder="Total Quantity"
                                     readOnly
                                 />

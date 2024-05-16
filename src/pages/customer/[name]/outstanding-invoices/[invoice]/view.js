@@ -22,7 +22,7 @@ const view = () => {
         customerName: '', // Initialize with an empty string
         dueDate: '', // Set dueDate 10 days ahead of postingDate
         items: [{
-           
+
             itemName: '',
             quantity: 1,
             rate: '',
@@ -44,8 +44,8 @@ const view = () => {
                     setCustomerData({
                         customerName: customer.customer_name, // Initialize with an empty string
                         dueDate: customer.due_date,
-                       
-                        items:customer.items
+
+                        items: customer.items
                     })
                 }
             }
@@ -60,13 +60,13 @@ const view = () => {
             }
         }
         else {
-            
+
         }
 
     }
 
 
-   
+
 
     const addNewItem = () => {
         const newItem = {
@@ -113,7 +113,7 @@ const view = () => {
                                         <h5 className="card-title text-center pb-0 fs-4"> Invoice Details</h5>
                                     </div>
                                     <div className='' style={{ position: 'absolute', right: '20px', top: '20px' }} onClick={() => {
-                                        router.push('/customer/' + name +'/outstanding-invoices')
+                                        router.push('/customer/' + name + '/outstanding-invoices')
                                     }}>
                                         <div className="btn btn-primary iconOuter cancelIcon"  >
                                             <i className="fa-solid fa-xmark"></i>
@@ -158,7 +158,7 @@ const view = () => {
                                                 readOnly
                                             />
                                         </div>
-                                        
+
 
                                         <DataTable
                                             head={[
@@ -169,9 +169,9 @@ const view = () => {
                                             ]}
                                             title='Customer'
                                             itemList={customerData.items}
-                                            // addNewItem={addNewItem}
-                                            // removeList={removeList}
-                                            // handleItemChange={handleItemChange}
+                                        // addNewItem={addNewItem}
+                                        // removeList={removeList}
+                                        // handleItemChange={handleItemChange}
                                         />
 
                                         <div className="w-100">
@@ -200,7 +200,7 @@ const DataTable = ({ head, itemList, removeList, handleItemChange }) => {
     useEffect(() => {
         // console.log(itemList)
         setTotalAmount(itemList.reduce((total, item) => total + item.base_rate * item.qty, 0))
-        setTotalQuan(itemList.reduce((total, item) => total + item.qty, 0))
+        setTotalQuan(itemList.reduce((total, item) => parseFloat(total) + parseFloat(item.qty), 0))
     }, [itemList])
 
     return (

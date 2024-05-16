@@ -167,9 +167,10 @@ const MakeAPayment = () => {
         const filters = [
             ['supplier', '=', name],  // Update to use the provided name parameter
             ['docstatus', '=', '1'],
-            ['status', '!=', 'Cancel']
+            ['status', '!=', 'Cancel'],
+
         ];
-        const fields = ['name', 'supplier', 'grand_total', 'outstanding_amount'];
+        const fields = ['name', 'supplier', 'grand_total', 'outstanding_amount',];
 
         // Construct the dynamic URL
         const url = `${apiUrl}?filters=${encodeURIComponent(JSON.stringify(filters))}&fields=${encodeURIComponent(JSON.stringify(fields))}`;

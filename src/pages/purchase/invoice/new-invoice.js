@@ -326,7 +326,7 @@ const DataTable = ({ head, itemList, addNewItem, removeList, handleItemChange, u
         setTotalAmount(itemList.reduce((total, item) => total + item.rate * item.quantity, 0))
         setTotalQuan(itemList.reduce((total, item) => {
             if (parseInt(total) + parseInt(item.quantity) < 10) {
-                return (total + item.quantity)
+                return (parseFloat(total) + parseFloat(item.quantity))
             } else {
                 return parseFloat(total) + parseFloat(item.quantity)
             }
@@ -397,7 +397,7 @@ const DataTable = ({ head, itemList, addNewItem, removeList, handleItemChange, u
                                 <input
                                     type="number"
                                     className='form-control'
-                                    value={totalQuan}
+                                    value={parseFloat(totalQuan)}
                                     placeholder="Total Quantity"
                                     readOnly
                                 />

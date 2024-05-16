@@ -59,7 +59,7 @@ const view = () => {
                 }
             }
         }
-    
+
 
     }
 
@@ -172,7 +172,7 @@ const view = () => {
 
                                         <div className="w-100">
                                             <button className="btn btn-primary login-btn" type="button" onClick={() => {
-                                               router.push('/purchase/invoice')
+                                                router.push('/purchase/invoice')
                                             }}>Cancel Invoice</button>
                                         </div>
                                     </form>
@@ -196,7 +196,7 @@ const DataTable = ({ head, itemList, removeList, handleItemChange }) => {
     useEffect(() => {
         // console.log(itemList)
         setTotalAmount(itemList.reduce((total, item) => total + item.base_rate * item.qty, 0))
-        setTotalQuan(itemList.reduce((total, item) => total + item.qty, 0))
+        setTotalQuan(itemList.reduce((total, item) => parseFloat(total) + parseFloat(item.qty), 0))
     }, [itemList])
 
     return (

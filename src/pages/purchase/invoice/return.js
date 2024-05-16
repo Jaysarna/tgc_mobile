@@ -336,7 +336,7 @@ const TableDataList = ({ item, removeList, handleItemChange }) => {
         } catch (err) {
             console.log(err);
             if (err.response.status === 403) {
-               sessionStorage.clear()
+                sessionStorage.clear()
             }
             else {
                 handleError(err)
@@ -392,7 +392,7 @@ const TableDataList = ({ item, removeList, handleItemChange }) => {
             </td>
             <td className="table-row__td">
                 <div className="table-row__info" style={{ paddingLeft: '0px' }}>
-                    <p className="table-row__name">{(isNaN(item.rate) ? 0 : item.rate) * (isNaN(item.quantity) ? 0 : item.quantity)}</p>
+                    <p className="table-row__name">{ }</p>
                 </div>
             </td>
 

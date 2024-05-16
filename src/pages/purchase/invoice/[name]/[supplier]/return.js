@@ -25,7 +25,7 @@ const InvoiceData = () => {
 
     const router = useRouter();
     const { name, supplier } = router.query;
-    
+
 
 
     const [customerData, setCustomerData] = useState({
@@ -330,7 +330,7 @@ const DataTable = ({ head, itemList, addNewItem, removeList, handleItemChange })
     useEffect(() => {
         // console.log(itemList)
         setTotalAmount(itemList.reduce((total, item) => total + item.rate * item.quantity, 0))
-        setTotalQuan(itemList.reduce((total, item) => total + item.quantity, 0))
+        setTotalQuan(itemList.reduce((total, item) => parseFloat(total) + parseFloat(item.quantity), 0))
     }, [itemList])
 
 
