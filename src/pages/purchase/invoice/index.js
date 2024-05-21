@@ -99,7 +99,6 @@ const DataTable = ({ tableData }) => {
             }
         },
 
-
         {
             name: 'grand_total',
             label: 'Grand Total'

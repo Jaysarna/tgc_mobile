@@ -103,7 +103,7 @@ const DataTable = () => {
                     }
                 }
             },
-            { name: 'Create', },
+            { name: 'Make a Payment', },
             { name: 'Edit ', },
 
         ]

@@ -105,7 +105,7 @@ const DataTable = () => {
         ]
         : [
             { name: 'Customer Name', label: 'Customer Name' },
-            { name: 'Make Payment', label: 'Label' },
+            { name: 'Receive Payment', label: 'Label' },
             { name: 'creation', label: 'Date' },
         ];
 
