@@ -234,7 +234,7 @@ const InvoiceData = () => {
                                         <h5 className="card-title text-center pb-0 fs-4"> Purchase Return</h5>
                                     </div>
                                     <div className='' style={{ position: 'absolute', right: '20px', top: '20px' }} onClick={() => {
-                                        route.push('/puchase/invoice')
+                                        router.push('/puchase/invoice')
                                     }}>
                                         <div className="btn btn-primary iconOuter cancelIcon"  >
                                             <i className="fa-solid fa-xmark"></i>

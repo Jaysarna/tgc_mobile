@@ -12,6 +12,7 @@ import { Autocomplete, TextField, Dialog, DialogTitle, DialogContent, DialogCont
 import newitem from '@/pages/item/newitem';
 import SearchSelect from '@/customhook/autocomplete/SeachSelect';
 import addNewSupplier from '@/features/supplier/supplier.services';
+import { handleShowApiError } from '@/features/error/getErrorApi';
 
 
 
@@ -169,6 +170,7 @@ const InvoiceData = () => {
                 route.push('/main');
             }
         } catch (error) {
+            handleShowApiError(error)
             if (error.response?.status === 403) {
                 sessionStorage.clear()
             }

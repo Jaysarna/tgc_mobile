@@ -163,18 +163,18 @@ const DataTable = () => {
                                         checked={sample === 1}
                                         onChange={handleSample}
                                     />
-                                    <strong className="form-check-strong" htmlFor="docStatusCheckbox">
+                                    <strong className="form-check-strong " htmlFor="docStatusCheckbox" style={{ marginTop: '3px' }}>
                                         Sample
                                     </strong>
                                 </div>
                             </div>
-                            <div className="col-md-12">
+                            {/* <div className="col-md-12">
                                 <div className="btn btn-primary iconOuter" onClick={() => {
                                     route.push('/customer/new-customer')
                                 }}  >
                                     <i className="bi bi-plus-circle"></i>
                                 </div>
-                            </div>
+                            </div> */}
                         </h6>
 
 
