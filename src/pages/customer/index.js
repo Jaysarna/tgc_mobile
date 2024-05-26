@@ -6,10 +6,7 @@ import withAuth from '@/customhook/withAuth';
 import { useRouter } from 'next/router';
 import MUIDataTable from 'mui-datatables'
 import { AddIcon, EditIcon } from '@/icons/actions';
-import { Pagination } from '@/customhook/pagination';
 import { authHeader, getAuthHeader } from '@/helpers/Header';
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { handleError } from '@/Api/showError';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 
@@ -91,7 +88,7 @@ const DataTable = () => {
             { name: 'Outstanding Amount', label: 'Outstanding Amount' },
 
             {
-                name: 'Make Payment',
+                name: 'Recive Payment',
                 filter: false,
                 // options: { customBodyRender: () => <AddIcon className='plus-icon-btn' onClick={() => route.push(`/customer/${item[0]}/recive-payment`)} /> }
             },
