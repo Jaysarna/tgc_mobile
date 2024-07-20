@@ -10,6 +10,7 @@ import { handleError } from '@/Api/showError';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { AddIcon } from '@/icons/actions';
 import { get } from '@/configs/apiUtils';
+import moment from 'moment';
 
 const ItemList = () => {
     const [tableData, setTableData] = useState([]);
@@ -67,6 +68,19 @@ const DataTable = ({ tableData }) => {
 
     const columns = [
         {
+            name: 'posting_date',
+            label: 'Date',
+            options: {
+                customBodyRender: (value) => {
+                    return (
+                        <>
+                            {moment(value).format('l')}
+                        </>
+                    )
+                }
+            }
+        },
+        {
             name: 'supplier',
             options: {
                 display: false
@@ -79,7 +93,7 @@ const DataTable = ({ tableData }) => {
             options: {
 
                 customBodyRender: (value, tableMeta) => {
-                    const name = tableMeta.rowData[0]
+                    const name = tableMeta.rowData[1]
 
                     return (
                         < div className='table-row__info' style={{ cursor: 'pointer' }} onClick={() => {
@@ -114,10 +128,6 @@ const DataTable = ({ tableData }) => {
             }
         },
         {
-            name: 'posting_date',
-            label: 'Date'
-        },
-        {
             name: 'outstanding_amount',
             label: 'Outstanding Amount',
             options: {
@@ -148,7 +158,7 @@ const DataTable = ({ tableData }) => {
             label: 'Make a Payment',
             options: {
                 customBodyRender: (dataIndex, tableMeta) => {
-                    const name = tableMeta.rowData[0]
+                    const name = tableMeta.rowData[1]
                     return (
                         <AddIcon
                             className="plus-icon-btn"
@@ -164,9 +174,9 @@ const DataTable = ({ tableData }) => {
             label: 'Return',
             options: {
                 customBodyRender: (dataIndex, tableMeta) => {
-                    const name = tableMeta.rowData[0]
-                    const invoice = tableMeta.rowData[1]
-                    const is_return = tableMeta.rowData[2]
+                    const name = tableMeta.rowData[1]
+                    const invoice = tableMeta.rowData[2]
+                    const is_return = tableMeta.rowData[3]
                     if (!is_return) {
 
                         return (
