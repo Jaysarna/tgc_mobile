@@ -24,7 +24,8 @@ export default withAuth(Index);
 
 
 const AddRemoveForm = () => {
-    const [journalEntry, setJournalEntry] = useState({
+
+    const intialData = {
         entryType: 'Journal Entry',
         type: '',
         postingDate: new Date().toISOString().substr(0, 10),
@@ -39,7 +40,9 @@ const AddRemoveForm = () => {
             credit: 0
 
         },]
-    });
+    }
+
+    const [journalEntry, setJournalEntry] = useState(intialData);
 
     const [total, setTotal] = useState({
         credit: 0,
@@ -183,13 +186,14 @@ const AddRemoveForm = () => {
             const response = await post(apiUrl, requestData)
 
             console.log(response)
-            if (res?.data) {
+            if (response?.data) {
                 if (journalEntry.type === 'Add') {
                     toast.success("Money Added Successfully")
                 }
                 else {
                     toast.success("Money Removed Successfully")
                 }
+                setJournalEntry(intialData)
             }
 
             if (response.statusText === 'OK') {
