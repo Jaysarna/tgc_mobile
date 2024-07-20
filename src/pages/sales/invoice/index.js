@@ -104,9 +104,9 @@ const DataTable = ({ tableData }) => {
         {
             name: 'customer',
             label: 'Customer',
-            // options: {
-            //     display: false
-            // }
+            options: {
+                display: false
+            }
         },
 
 
@@ -148,6 +148,21 @@ const DataTable = ({ tableData }) => {
                         <>
                             $ {value}
                         </>
+                    )
+                }
+            }
+        },
+        {
+            name: 'payment',
+            label: 'Receive Payment',
+            options: {
+                customBodyRender: (dataIndex, tableMeta) => {
+                    const name = tableMeta.rowData[2]
+                    return (
+                        <AddIcon
+                            className="plus-icon-btn"
+                            onClick={() => router.push(`/customer/${name}/recive-payment`)}
+                        />
                     )
                 }
             }

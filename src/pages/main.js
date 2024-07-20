@@ -20,7 +20,7 @@ const symbol = [
 const cardRouting = [
     "/transcation/list",
     "/item",
-    "/customer",
+    "/sales/invoice",
     "purchase/invoice",
     "/main"
 ]

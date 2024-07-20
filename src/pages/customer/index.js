@@ -97,7 +97,7 @@ const DataTable = () => {
             },
 
             {
-                name: 'Recive Payment',
+                name: 'Receive Payment',
                 filter: false,
                 // options: { customBodyRender: () => <AddIcon className='plus-icon-btn' onClick={() => route.push(`/customer/${item[0]}/recive-payment`)} /> }
             },
