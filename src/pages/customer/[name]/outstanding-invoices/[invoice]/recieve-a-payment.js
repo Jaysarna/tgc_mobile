@@ -13,7 +13,7 @@ const recivepayment = () => {
   const { name, invoice } = router.query
   // console.log(name)
 
-  async function fetchCSData (nme) {
+  async function fetchCSData(nme) {
     const authHeader = getAuthHeader()
 
     if (nme) {
@@ -23,7 +23,7 @@ const recivepayment = () => {
           authHeader
         )
         console.log(response.data.data)
-        if (response.status === 200) {
+        if (response?.status === 200) {
           const customer = response.data.data
           // console.log(customer)
           setPaymentData({
@@ -33,7 +33,7 @@ const recivepayment = () => {
         }
       } catch (err) {
         console.log(err)
-        if (err.response.status === 403) {
+        if (err.response?.status === 403) {
           sessionStorage.clear()
         } else {
           handleError(err)
@@ -126,7 +126,7 @@ const recivepayment = () => {
         router.push('/customer')
       }
     } catch (err) {
-      if (err.response.status === 403) {
+      if (err.response?.status === 403) {
         sessionStorage.clear()
       } else {
         handleError(err)
@@ -136,7 +136,7 @@ const recivepayment = () => {
 
   const [tableData, setTableData] = useState([])
 
-  async function fetchOutstanding (name, invoice) {
+  async function fetchOutstanding(name, invoice) {
     const authHeader = getAuthHeader()
     var requestOptions = {
       method: 'GET',
@@ -160,7 +160,7 @@ const recivepayment = () => {
     } catch (error) {
       console.log('error', error)
       setTableData([])
-      if (error.response.status === 403) {
+      if (error.response?.status === 403) {
         sessionStorage.clear()
         router.push('/')
       } else {
@@ -449,7 +449,7 @@ const TableDataList = ({
   handleDelete
 }) => {
   const route = useRouter()
-  async function handleEdit (name) {
+  async function handleEdit(name) {
     route.push('/customer/' + name + '/edit')
   }
 

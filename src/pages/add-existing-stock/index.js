@@ -7,6 +7,7 @@ import { uid } from 'uid';
 import withAuth from '@/customhook/withAuth';
 import { handleError } from '@/Api/showError';
 import { handleItemPrice } from '@/features/item/getItemByItemCode';
+import { post } from '@/configs/apiUtils';
 
 
 
@@ -120,7 +121,7 @@ const InvoiceData = () => {
         const authHeader = getAuthHeader()
 
         try {
-            const response = await axios.post(apiUrl, requestData, authHeader);
+            const response = await post(apiUrl, requestData);
             console.log(response)
             if (response.statusText === 'OK') {
                 alert('Stock Created Successfully');
@@ -128,7 +129,7 @@ const InvoiceData = () => {
             }
         } catch (error) {
 
-            if (error.response.status === 403) {
+            if (error.response?.status === 403) {
                 sessionStorage.clear()
             }
             else {
@@ -368,7 +369,7 @@ const TableDataList = ({ item, removeList, handleItemChange }) => {
         } catch (err) {
             console.log(err);
 
-            if (err.response.status === 403) {
+            if (err.response?.status === 403) {
                 sessionStorage.clear()
                 alert("Login Expired")
                 route.push('/')

@@ -5,22 +5,14 @@ import withAuth from '@/customhook/withAuth';
 import { useRouter } from 'next/router';
 import MUIDataTable from 'mui-datatables';
 import { AddIcon, EditIcon } from '@/icons/actions';
-import { Pagination } from '@/customhook/pagination';
 import { handleError } from '@/Api/showError';
 import { getAuthHeader } from '@/helpers/Header';
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import moment from 'moment';
+import { get } from '@/configs/apiUtils';
 
 
 
-
-
-
-
-
-// ItemList Component
 const ItemList = () => {
     const router = useRouter();
 
@@ -50,7 +42,7 @@ const DataTable = () => {
         } catch (err) {
             setTableData([]);
             console.log(err);
-            if (err.response.status === 403) {
+            if (err.response?.status === 403) {
                 sessionStorage.clear();
             } else {
                 handleError(err);
@@ -62,12 +54,13 @@ const DataTable = () => {
         const authHeader = getAuthHeader();
 
         try {
-            const listRes = await axios.get('https://tgc67.online/api/method/supplier_with_samples', authHeader);
+            const listRes = await get('supplier_with_samples')
+            // const listRes = await axios.get('https://tgc67.online/api/method/supplier_with_samples', authHeader);
             console.log(listRes.data.message)
             setSampleData(listRes.data.message);
         } catch (err) {
             console.log(err);
-            if (err.response.status === 403) {
+            if (err.response?.status === 403) {
                 sessionStorage.clear();
             } else {
                 handleError(err);
@@ -231,52 +224,3 @@ const DataTable = () => {
     );
 };
 
-// const InvoiceList = ({ invoice, itemList, name }) => {
-//     const route = useRouter();
-//     const [isItemList, setIsItemList] = useState(false);
-
-//     const handleEdit = () => {
-//         route.push(`/supplier/${name}/sample-list/${invoice}/edit-sample-to-invoice`);
-//     };
-
-//     return (
-//         <>
-//             <div className="list-invoice ">
-//                 <span className="d-flex align-item-center btn btn-outline-primary customer-sample">
-//                     {isItemList ? (
-//                         <ArrowDropUpIcon
-//                             onClick={() => {
-//                                 setIsItemList(!isItemList);
-//                             }}
-//                         />
-//                     ) : (
-//                         <ArrowDropDownIcon
-//                             onClick={() => {
-//                                 setIsItemList(!isItemList);
-//                             }}
-//                         />
-//                     )}
-//                     <li
-//                         onClick={() => {
-//                             setIsItemList(!isItemList);
-//                         }}
-//                         style={{ cursor: 'pointer', listStyle: 'none' }}
-//                     >
-//                         {invoice}
-//                     </li>
-
-//                     <h6 className="ml-2 mb-2" style={{ cursor: 'pointer' }}>
-//                         <EditIcon onClick={handleEdit} />
-//                     </h6>
-//                 </span>
-//             </div>
-//             <div className="list-invoice-item ml-4">
-//                 {isItemList &&
-//                     itemList.length > 0 &&
-//                     itemList.map(item => (
-//                         <li className="sample-item-li">{item}</li>
-//                     ))}
-//             </div>
-//         </>
-//     );
-// };

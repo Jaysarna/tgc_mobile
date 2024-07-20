@@ -59,7 +59,7 @@ const NewItem = () => {
         } catch (error) {
 
             console.error('API Error:', error);
-            if (error.response.status === 403) {
+            if (error.response?.status === 403) {
                 alert("Login Expired")
                 route.push('/')
             }

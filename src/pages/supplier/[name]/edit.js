@@ -27,7 +27,7 @@ const EditCustomer = () => {
             try {
                 const response = await axios.get(`https://tgc67.online/api/resource/Supplier/${nme}`, authHeader)
                 // console.log(response.data.data)
-                if (response.status === 200) {
+                if (response?.status === 200) {
                     const customer = response.data.data;
                     // console.log(customer)
                     setCustomerData({
@@ -40,7 +40,7 @@ const EditCustomer = () => {
             }
             catch (err) {
                 console.log(err)
-                if (err.response.status === 403) {
+                if (err.response?.status === 403) {
                     alert("Login Expired")
                     router.push('/')
                 }
@@ -87,13 +87,13 @@ const EditCustomer = () => {
             try {
                 const response = await axios.put(apiUrl, requestData, authHeader);
 
-                if (response.status === 200) {
+                if (response?.status === 200) {
                     alert("Supplier Updated Successfully");
                     router.push('/supplier');
                 }
             } catch (error) {
 
-                if (error.response.status === 403) {
+                if (error.response?.status === 403) {
                     sessionStorage.clear()
                     alert("Login Expired")
                     router.push('/')

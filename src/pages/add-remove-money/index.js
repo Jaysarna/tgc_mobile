@@ -6,13 +6,15 @@ import { getAuthHeader } from '@/helpers/Header';
 import { uid } from 'uid';
 import withAuth from '@/customhook/withAuth';
 import { handleError } from '@/Api/showError';
+import { post } from '@/configs/apiUtils';
+import toast from 'react-hot-toast';
 
 
 
 const Index = () => {
     return (
         <div>
-            <InvoiceData />
+            <AddRemoveForm />
         </div>
     );
 }
@@ -21,14 +23,14 @@ export default withAuth(Index);
 
 
 
-const InvoiceData = () => {
+const AddRemoveForm = () => {
     const [journalEntry, setJournalEntry] = useState({
         entryType: 'Journal Entry',
-        type: '', // Initialize with an empty string
-        postingDate: new Date().toISOString().substr(0, 10), // Set to today's date
+        type: '',
+        postingDate: new Date().toISOString().substr(0, 10),
         referenceNumber: '',
         amount: 0,
-        referenceDate: new Date().toISOString().substr(0, 10), // Set to today's date,,
+        referenceDate: new Date().toISOString().substr(0, 10),
         // dueDate: new Date(new Date().getTime() + 10 * 24 * 60 * 60 * 1000).toISOString().substr(0, 10), // Set dueDate 10 days ahead of postingDate
         items: [{
             uid: uid(),
@@ -119,32 +121,20 @@ const InvoiceData = () => {
         });
     }
 
-
-    const [cusList, setCusList] = useState([])
-
     const route = useRouter();
 
     const handlejournalEntryChange = (e) => {
-        // const { name, value, type, checked } = e.target;
-        // setJournalEntry({
-        //     ...journalEntry,
-        //     [name]: type === 'checkbox' ? checked : value,
-        // });
-        // console.log(e.target.value)
         setJournalEntry({
             ...journalEntry,
             type: e.target.value,
         });
     };
 
-    const handleAddCustomer = async (e) => {
+    const handleAddMoney = async (e) => {
         e.preventDefault();
         const authHeader = getAuthHeader()
 
-
-
         const apiUrl = 'https://tgc67.online/api/resource/Journal%20Entry';
-
 
         const add = [
             {
@@ -181,32 +171,42 @@ const InvoiceData = () => {
                 "cheque_no": journalEntry.referenceNumber,
                 // "cheque_date": journalEntry.referenceDate,
                 "docstatus": "1",
+
                 "posting_date": journalEntry.postingDate,
-                // "accounts": buildItemsArray(journalEntry.items),
+                "cheque_date": journalEntry.postingDate,
                 "accounts": journalEntry.type === "Add" ? add : remove,
 
             },
         };
         // console.log(requestData)
         try {
-            const response = await axios.post(apiUrl, requestData, authHeader)
+            const response = await post(apiUrl, requestData)
 
+            console.log(response)
+            if (res?.data) {
+                if (journalEntry.type === 'Add') {
+                    toast.success("Money Added Successfully")
+                }
+                else {
+                    toast.success("Money Removed Successfully")
+                }
+            }
 
             if (response.statusText === 'OK') {
-                if(journalEntry.type==='Add'){
+                if (journalEntry.type === 'Add') {
                     alert("Money Added Successfully")
                 }
-                else{
+                else {
                     alert("Money Removed Successfully")
                 }
-                
+
                 route.push('/main')
             }
             // console.log('API Response:', response.statusText)
         } catch (error) {
 
 
-            if (error.response.status === 403) {
+            if (error.response?.status === 403) {
 
                 sessionStorage.clear()
             }
@@ -258,7 +258,7 @@ const InvoiceData = () => {
                                         </div>
                                     </div>
 
-                                    <form onSubmit={handleAddCustomer} method="post" className="row g-3 needs-validation">
+                                    <form onSubmit={handleAddMoney} method="post" className="row g-3 needs-validation">
                                         <div className="col-12">
                                             <label htmlFor="entryType" className="form-label">Entry Type</label>
                                             <div className="has-validation">
@@ -304,8 +304,7 @@ const InvoiceData = () => {
 
                                         <div className="col-12">
                                             <label htmlFor="referenceNumber" className="form-label">Reference Number or Note</label>
-                                            <input
-                                                type="text"
+                                            <textarea
                                                 name="referenceNumber"
                                                 className="form-control"
                                                 id="referenceNumber"
@@ -313,6 +312,7 @@ const InvoiceData = () => {
                                                 onChange={handleReference}
                                             />
                                         </div>
+
 
 
 
@@ -335,216 +335,5 @@ const InvoiceData = () => {
 };
 
 
-const DataTable = ({ head, itemList, addNewItem, removeList, handleItemChange, total }) => {
-    const [totalDebit, setTotalDebit] = useState(0)
-    const [totalCredit, setTotalCredit] = useState(0)
 
-    useEffect(() => {
-        // console.log(itemList)
-        setTotalDebit(itemList.reduce((total, item) => total + item.debit, 0))
-        setTotalCredit(itemList.reduce((total, item) => total + item.credit, 0))
-    }, [itemList])
-    return (
-        <>
-
-            <div className="container-7" style={{ margin: 'auto' }}>
-
-                <div className="row row--top-10">
-                    <div className="col-md-12">
-                        <div className="table-container">
-                            <table className="table">
-                                <thead className="table__thead">
-                                    <tr>
-                                        {
-                                            head.map((item, index) => {
-                                                return (
-                                                    <th className="table__th" scope='col' key={index}>{item}</th>
-                                                )
-                                            })
-                                        }
-
-                                        <th className="table__th"></th>
-                                    </tr>
-                                </thead>
-                                <tbody className="table__tbody">
-                                    {
-                                        itemList.map((item, index) => {
-                                            return (
-                                                <>
-                                                    <TableDataList key={index}
-                                                        item={item}
-                                                        removeList={removeList}
-                                                        handleItemChange={handleItemChange}
-                                                    />
-                                                </>
-                                            )
-                                        })
-                                    }
-
-
-
-                                </tbody>
-                            </table>
-                        </div>
-                        <div style={{ width: '100%' }}>
-                            <button className="btn btn-primary new-row login-btn" type="button" onClick={() => addNewItem()} >New Row</button>
-                        </div>
-                    </div>
-                </div>
-                <br />
-            </div>
-            <div className="row mt-4" style={{ marginLeft: '0px', marginRight: '0px', padding: '10px' }}>
-                <div className="col-5 mb-4">
-                    <label htmlFor="total debit" className="form-label">Total Debit </label>
-                    <input
-                        type="number"
-                        className='form-control'
-                        value={totalDebit}
-                        placeholder="Debit"
-                        readOnly
-                    />
-                </div>
-                <div className="col-5 mb-4">
-                    <label htmlFor="total Credit" className="form-label">Total Credit</label>
-                    <input
-                        type="number"
-                        className='form-control'
-                        value={totalCredit}
-                        placeholder="Credit"
-                        readOnly
-                    />
-                </div>
-            </div>
-
-        </>
-    );
-};
-
-
-
-
-const TableDataList = ({ item, removeList, handleItemChange }) => {
-    const [itemOptionList, setItemOptionList] = useState([]);
-
-    const route = useRouter()
-
-    const handleaccountChange = (e) => {
-        const selectedItemId = e.target.value;
-        const selectedOption = itemOptionList.find((option) => option.name === selectedItemId);
-
-        if (selectedOption) {
-            const newItem = {
-                ...item,
-                account: selectedOption.name, // Set the item name based on the selected option
-
-            };
-            handleItemChange(newItem);
-        }
-    };
-
-    const handleCredit = (e) => {
-
-        const newItem = {
-            ...item,
-            credit: parseFloat(e.target.value),
-        };
-        handleItemChange(newItem);
-    };
-
-    const handleDebit = (e) => {
-        const newItem = {
-            ...item,
-            debit: parseFloat(e.target.value),
-        };
-        handleItemChange(newItem);
-    };
-
-
-    async function fetchAccount() {
-        const authHeader = getAuthHeader()
-
-
-        try {
-            const res = await axios.get('https://tgc67.online/api/resource/Account?limit_page_length=100&limit=100&&filters=[["is_group", "=", "0"]]', authHeader)
-            // console.log(res.data.data)
-            setItemOptionList(res.data.data)
-        }
-        catch (err) {
-            console.log(err)
-            setItemOptionList([])
-
-            if (err.response.status === 403) {
-                alert("Login Expired")
-                route.push('/')
-            }
-            else {
-                handleError(err)
-            }
-        }
-    }
-
-
-    useEffect(() => {
-        //    let salesItem= localStorage.getItem('saleItem')
-        fetchAccount();
-        // handleItemChange(salesItem)
-    }, []);
-
-    return (
-        <tr className="table-row table-row--chris">
-            <td data-column="Policy" className="table-row__td" style={{ maxWidth: '200px', width: '40%' }}>
-                <div className="table-row-input">
-                    <select
-                        value={item.account}
-                        onChange={handleaccountChange}
-                        className="form-select"
-                        required
-                    >
-                        <option value="">Select Any Account</option>
-                        {/* {itemOptionList.length > 0 && itemOptionList.map((item) => (
-                            <option value={item.name} key={item.name}>
-                                {item.name}
-                            </option>
-                        ))} */}
-
-                        <option>Cash - TGC</option>
-                        <option>Capital Stock - TGC</option>
-                    </select>
-                </div>
-            </td>
-
-            <td data-column="debit" className="table-row__td" style={{ maxWidth: '200px', width: '15%' }}>
-                <div className="table-row-input" style={{ maxWidth: '200px' }}>
-                    <input
-                        type="number"
-                        value={item.debit}
-                        onChange={handleDebit}
-                        placeholder="Debit"
-                        readOnly={item.credit > 0}
-                    />
-                </div>
-            </td>
-            <td data-column="credit" className="table-row__td" style={{ maxWidth: '200px', width: '15%' }}>
-                <div className="table-row-input" style={{ maxWidth: '200px' }}>
-                    <input
-                        type="number"
-                        value={item.credit}
-                        onChange={handleCredit}
-                        placeholder="Credit"
-                        readOnly={item.debit > 0}
-                    />
-                </div>
-            </td>
-
-
-            <td className="table-row__td">
-                <div className="table-row__info" style={{ paddingLeft: '0px' }}>
-                    <p className="table-row__name" >
-                        <i className="fa-solid fa-trash-can" onClick={() => removeList(item.uid)}></i>
-                    </p>
-                </div>
-            </td>
-        </tr>
-    );
-};
 

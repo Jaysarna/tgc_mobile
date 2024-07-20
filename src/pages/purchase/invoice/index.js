@@ -9,6 +9,7 @@ import { authHeader, getAuthHeader } from '@/helpers/Header';
 import { handleError } from '@/Api/showError';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { AddIcon } from '@/icons/actions';
+import { get } from '@/configs/apiUtils';
 
 const ItemList = () => {
     const [tableData, setTableData] = useState([]);
@@ -22,20 +23,20 @@ const ItemList = () => {
             ['status', '!=', 'Cancel'],
 
         ];
-        const fields = ['name', 'supplier', 'grand_total', 'outstanding_amount', 'posting_date', 'is_return'];
+        const fields = ['name', 'supplier', 'grand_total', 'outstanding_amount', 'posting_date', 'is_return', 'custom_payment_amount_in_advance'];
         const orderBy = "creation desc";
 
         // Construct the dynamic URL
         const url = `${apiUrl}?filters=${encodeURIComponent(JSON.stringify(filters))}&fields=${encodeURIComponent(JSON.stringify(fields))}&order_by=${orderBy}`;
 
         try {
-            const listRes = await axios.get(url, authHeader)
+            const listRes = await get(url)
             // console.log(listRes.data)
-            setTableData(listRes.data.data)
+            setTableData(listRes?.data)
         }
         catch (err) {
             console.log(err)
-            if (err.response.status === 403) {
+            if (err.response?.status === 403) {
                 alert("Login Expired")
                 router.push('/')
             }
@@ -101,7 +102,16 @@ const DataTable = ({ tableData }) => {
 
         {
             name: 'grand_total',
-            label: 'Grand Total'
+            label: 'Grand Total',
+            options: {
+                customBodyRender: (value) => {
+                    return (
+                        <>
+                            $ {value}
+                        </>
+                    )
+                }
+            }
         },
         {
             name: 'posting_date',
@@ -110,6 +120,19 @@ const DataTable = ({ tableData }) => {
         {
             name: 'outstanding_amount',
             label: 'Outstanding Amount',
+            options: {
+                customBodyRender: (value) => {
+                    return (
+                        <>
+                            $ {value}
+                        </>
+                    )
+                }
+            }
+        },
+        {
+            name: 'custom_payment_amount_in_advance',
+            label: 'Advance Amount',
             options: {
                 customBodyRender: (value) => {
                     return (
@@ -135,6 +158,7 @@ const DataTable = ({ tableData }) => {
                 }
             }
         },
+
         {
             name: 'Return',
             label: 'Return',

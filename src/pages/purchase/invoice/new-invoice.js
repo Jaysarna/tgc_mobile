@@ -13,6 +13,10 @@ import newitem from '@/pages/item/newitem';
 import SearchSelect from '@/customhook/autocomplete/SeachSelect';
 import addNewSupplier from '@/features/supplier/supplier.services';
 import { handleShowApiError } from '@/features/error/getErrorApi';
+import toast from 'react-hot-toast';
+import { get, post, put } from '@/configs/apiUtils';
+import moment from 'moment';
+import DatePicker from 'react-datepicker';
 
 
 
@@ -29,9 +33,13 @@ const Index = () => {
 export default withAuth(Index);
 
 const InvoiceData = () => {
-    const [customerData, setCustomerData] = useState({
+
+    const intialDate = {
         supplier: '',
         paymentAmountInAdvance: 0,
+        remarks: '',
+        postingDate: new Date().toISOString().substr(0, 10),
+        dueDate: new Date().toISOString().substr(0, 10),
         docStatus: 1,
         items: [
             {
@@ -41,7 +49,8 @@ const InvoiceData = () => {
                 rate: 0,
             },
         ],
-    });
+    }
+    const [purchaseData, setPurchaseData] = useState(intialDate);
 
 
     const [isLoading, setLoading] = useState(false)
@@ -54,18 +63,18 @@ const InvoiceData = () => {
             quantity: 1,
             rate: 0,
         };
-        const updatedItems = [...customerData.items];
+        const updatedItems = [...purchaseData.items];
         updatedItems.push(newItem);
-        setCustomerData({
-            ...customerData,
+        setPurchaseData({
+            ...purchaseData,
             items: updatedItems,
         });
     };
 
     const removeList = (itemCodeToFilter) => {
-        const filteredItems = customerData.items.filter(item => item.uid !== itemCodeToFilter);
-        setCustomerData({
-            ...customerData,
+        const filteredItems = purchaseData.items.filter(item => item.uid !== itemCodeToFilter);
+        setPurchaseData({
+            ...purchaseData,
             items: filteredItems,
         });
     };
@@ -73,7 +82,7 @@ const InvoiceData = () => {
     function handleItemChange(updatedItem) {
         console.log(updatedItem)
 
-        const updatedItems2 = customerData.items.map((item) => {
+        const updatedItems2 = purchaseData.items.map((item) => {
 
             if (item.uid === updatedItem.uid) {
 
@@ -82,8 +91,8 @@ const InvoiceData = () => {
             return item;
         });
 
-        setCustomerData({
-            ...customerData,
+        setPurchaseData({
+            ...purchaseData,
             items: updatedItems2,
         });
     };
@@ -93,8 +102,9 @@ const InvoiceData = () => {
     async function fetchSupplier() {
         const authHeader = getAuthHeader()
         try {
-            const res = await axios.get('https://tgc67.online/api/resource/Supplier', authHeader)
-            setCusList(res.data.data);
+            const res = await get('/resource/Supplier')
+            // const res = await axios.get('https://tgc67.online/api/resource/Supplier', authHeader)
+            setCusList(res.data);
         } catch (err) {
             console.log(err);
             setCusList([]);
@@ -105,16 +115,16 @@ const InvoiceData = () => {
 
     const handleCustomerDataChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setCustomerData({
-            ...customerData,
+        setPurchaseData({
+            ...purchaseData,
             [name]: type === 'checkbox' ? checked : value,
         });
     };
 
 
     const handleSupplierChange = (value) => {
-        setCustomerData({
-            ...customerData,
+        setPurchaseData({
+            ...purchaseData,
             supplier: value,
         });
     }
@@ -124,18 +134,19 @@ const InvoiceData = () => {
         setLoading(true)
         e.preventDefault();
 
-        const apiUrl = 'https://tgc67.online/api/resource/Purchase%20Invoice';
+        // const apiUrl = 'https://tgc67.online/api/resource/Purchase%20Invoice';
 
         const sampleRequestData = {
             data: {
-                "supplier": customerData.supplier,
+                "supplier": purchaseData.supplier,
                 "set_warehouse": "Warehouse 1 - TGC",
-                // "expense_account": 'Stock In Hand - TGC',
-                "custom_payment_amount_in_advance": customerData.paymentAmountInAdvance,
+                "custom_payment_amount_in_advance": purchaseData.paymentAmountInAdvance,
                 "update_stock": "1",
                 "docstatus": 0,
-                "custom_sample": !(customerData.docStatus),
-                "items": customerData.items.map((item) => ({
+                remarks: purchaseData.remarks,
+                "custom_sample": !(purchaseData.docStatus),
+                "due_date": purchaseData.dueDate,
+                "items": purchaseData.items.map((item) => ({
                     "item_code": item.itemCode,
                     "qty": item.quantity,
                     "rate": item.rate,
@@ -149,16 +160,27 @@ const InvoiceData = () => {
 
 
         try {
-            let response1 = await axios.post(apiUrl, sampleRequestData, authHeader);
 
-            if (response1 && !response1.data.data.custom_sample) {
+            // let response1 = await axios.post(apiUrl, sampleRequestData, authHeader);
 
-                var response = await axios.put(apiUrl + '/' + response1.data.data.name, {
+            let response1 = await post('/resource/Purchase%20Invoice', sampleRequestData)
+
+            if (response1 && !response1.data.custom_sample) {
+
+                const res = await put('/resource/Purchase%20Invoice/' + response1.data.name, {
                     data: {
-                        "name": response1.data.data.name,
+                        "name": response1.data.name,
                         "docstatus": 1
                     }
-                }, authHeader);
+                });
+
+                if (res?.data) {
+                    toast.success("Invoice Created Successfully");
+                    setPurchaseData(intialDate)
+                }
+                // var response = await axios.put(apiUrl + '/' + response1.data.name, {
+
+                // }, authHeader);
 
             }
 
@@ -166,6 +188,7 @@ const InvoiceData = () => {
 
             if (response1.statusText === 'OK') {
                 setLoading(false)
+                toast.success('Create Invoice Successfully')
                 alert('Create Invoice Successfully')
                 route.push('/main');
             }
@@ -193,18 +216,18 @@ const InvoiceData = () => {
     const [updateSelectItem, setUpdateSelectItem] = useState(false)
 
     const handleDocStatusCheckboxChange = (e) => {
-        setCustomerData({
-            ...customerData,
-            docStatus: customerData.docStatus === 1 ? 0 : 1,
+        setPurchaseData({
+            ...purchaseData,
+            docStatus: purchaseData.docStatus === 1 ? 0 : 1,
         })
     }
 
 
     const handleUpdateValue = (value) => {
-        console.log(value)
+        // console.log(value)
         const newValue = (typeof value === 'object') ? value?.name : value;
-        console.log(newValue)
-        setCustomerData({ ...customerData, supplier: newValue });
+        // console.log(newValue)
+        setPurchaseData({ ...purchaseData, supplier: newValue });
     };
 
 
@@ -254,6 +277,18 @@ const InvoiceData = () => {
 
                                             />
                                         </div>
+                                        <div className="col-12 mb-2">
+                                            <label htmlFor="postingDate" className="form-label">Posting Date</label>
+                                            <input
+                                                type="date"
+                                                name="postingDate"
+                                                className="form-control"
+                                                value={purchaseData.postingDate}
+                                                onChange={handleCustomerDataChange}
+                                                required
+                                            />
+                                        </div>
+
 
                                         <div className="col-12 mb-4">
                                             <label htmlFor="paymentAmountInAdvance" className="form-label">Payment Amount In Advance</label>
@@ -261,14 +296,23 @@ const InvoiceData = () => {
                                                 type="number"
                                                 name="paymentAmountInAdvance"
                                                 className="form-control"
-                                                id="paymentAmountInAdvance"
-                                                value={customerData.paymentAmountInAdvance}
+                                                value={purchaseData.paymentAmountInAdvance}
                                                 onChange={handleCustomerDataChange}
-                                                required
+
                                             />
                                         </div>
 
 
+                                        <div className="col-12">
+                                            <label htmlFor="remarks" className="form-label">Reference Number or Note</label>
+                                            <textarea
+                                                name="remarks"
+                                                className="form-control"
+
+                                                value={purchaseData.remarks}
+                                                onChange={handleCustomerDataChange}
+                                            />
+                                        </div>
 
                                         <div className="col-12 mb-4">
                                             <div className="form-check">
@@ -277,7 +321,7 @@ const InvoiceData = () => {
                                                     name="docStatusCheckbox"
                                                     className="form-check-input"
                                                     id="docStatusCheckbox"
-                                                    checked={customerData.docStatus === 0}
+                                                    checked={purchaseData.docStatus === 0}
                                                     onChange={handleDocStatusCheckboxChange}
                                                 />
                                                 <strong className="form-check-strong" htmlFor="docStatusCheckbox">
@@ -294,12 +338,12 @@ const InvoiceData = () => {
                                                 "Amount"
                                             ]}
                                             title='Item'
-                                            itemList={customerData.items}
+                                            itemList={purchaseData.items}
                                             addNewItem={addNewItem}
                                             removeList={removeList}
                                             handleItemChange={handleItemChange}
                                             updateSelectItem={updateSelectItem}
-                                            customerData={customerData}
+                                            customerData={purchaseData}
                                             handleSupplierChange={handleSupplierChange}
                                         />
                                         <div className="w-100">
@@ -511,15 +555,20 @@ const TableDataList = ({ item, removeList, handleItemChange, updateSelectItem, c
 
         const authHeader = getAuthHeader()
 
+        const fields = `["item_code","item_name"]&limit=500`;
+        const url = `resource/Item?fields=${fields}`
+
         try {
-            const listRes = await axios.get('https://tgc67.online/api/resource/Item?fields=["item_code","item_name"]&limit=500', authHeader);
-            setItemOptionList(listRes.data.data);
+            const listRes = await get(url)
+            // const listRes = await axios.get('https://tgc67.online/api/resource/Item?fields=["item_code","item_name"]&limit=500', authHeader);
+            setItemOptionList(listRes.data);
         } catch (err) {
             console.log(err);
 
-            if (err.response.status === 403) {
+            if (err.response?.status === 403) {
                 sessionStorage.clear()
-                alert("Login Expired")
+                toast.success("Login Expired")
+                // alert("Login Expired")
                 router.push('/')
             }
             else {
@@ -553,7 +602,7 @@ const TableDataList = ({ item, removeList, handleItemChange, updateSelectItem, c
     const handleNewItem = async (e) => {
         e.preventDefault();
 
-        const apiUrl = 'https://tgc67.online/api/resource/Item';
+        // const apiUrl = 'https://tgc67.online/api/resource/Item';
 
         const requestData = {
             data: {
@@ -576,9 +625,10 @@ const TableDataList = ({ item, removeList, handleItemChange, updateSelectItem, c
             }])
 
         try {
-            const response = await axios.post(apiUrl, requestData, authHeader);
+            const response = await post('/resource/Item', requestData)
+            // const response = await axios.post(apiUrl, requestData, authHeader);
             // console.log(response)
-            if (response.statusText === 'OK') {
+            if (response?.statusText === 'OK') {
 
                 alert('New Item Added');
                 const newItem = {
@@ -859,7 +909,7 @@ const TableDataList = ({ item, removeList, handleItemChange, updateSelectItem, c
 //     } catch (error) {
 //         handleError(error)
 //         console.error('API Error:', error);
-//         //  if (error.response.status === 403) {
+//         //  if (error.response?.status === 403) {
 //         //      alert("Login Expired")
 //         //      route.push('/')
 //         //  }

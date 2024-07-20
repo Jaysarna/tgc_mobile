@@ -39,7 +39,7 @@ const view = () => {
             try {
                 const response = await axios.get(url + invoice, authHeader)
                 console.log(response.data.data)
-                if (response.status === 200) {
+                if (response?.status === 200) {
                     const customer = response.data.data;
                     setCustomerData({
                         customerName: customer.customer_name, // Initialize with an empty string
@@ -51,7 +51,7 @@ const view = () => {
             }
             catch (error) {
                 console.log(error)
-                if (error.response.status === 403) {
+                if (error.response?.status === 403) {
                     sessionStorage.clear()
                 }
                 else {

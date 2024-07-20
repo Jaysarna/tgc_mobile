@@ -18,6 +18,7 @@ import Head from 'next/head';
 import { handleShowApiError } from '@/features/error/getErrorApi';
 import { Autocomplete } from '@mui/material';
 import toast from 'react-hot-toast';
+import { get, post } from '@/configs/apiUtils';
 
 
 let name = "Customer"
@@ -35,12 +36,13 @@ export default withAuth(Index);
 
 const InvoiceData = () => {
     const [customerData, setCustomerData] = useState({
-        customerName: '', // Initialize with an empty string
-        postingDate: new Date().toISOString().substr(0, 10), // Set to today's date
-        dueDate: new Date(new Date().getTime() + 10 * 24 * 60 * 60 * 1000).toISOString().substr(0, 10), // Set dueDate 10 days ahead of postingDate
+        customerName: '',
+        postingDate: new Date().toISOString().substr(0, 10),
+        dueDate: new Date(new Date().getTime() + 10 * 24 * 60 * 60 * 1000).toISOString().substr(0, 10),
         docStatus: 1,
         advance_recieved: 0,
         custom_sample: 0,
+        remarks: '',
         items: [{
             uid: uid(),
             item_code: localStorage.getItem('saleItem') ? localStorage.getItem('saleItem') : '',
@@ -87,7 +89,6 @@ const InvoiceData = () => {
             ...customerData,
             items: filteredItems,
         });
-        // console.log(customerData.items)
     };
 
 
@@ -102,7 +103,7 @@ const InvoiceData = () => {
             return item;
         });
 
-        console.log(updatedItems2)
+        // console.log(updatedItems2)
         setCustomerData({
             ...customerData,
             items: updatedItems2
@@ -140,6 +141,7 @@ const InvoiceData = () => {
                 "customer": customerData.customerName,
                 "docstatus": customerData.docStatus,
                 "update_stock": 1,
+                remarks: customerData.remarks,
                 "due_date": customerData.dueDate,
                 "items": buildItemsArray(customerData.items),
                 "custom_sample": !(customerData.docStatus),
@@ -150,8 +152,14 @@ const InvoiceData = () => {
 
         // console.log(requestData)
         try {
-            const response = await axios.post(apiUrl, requestData, authHeader)
+            // const response = await axios.post(apiUrl, requestData, authHeader)
+            const response = await post('/resource/Sales%20Invoice', requestData)
             console.log(response)
+            if (response?.data) {
+                toast.success("Invoice Created Successfully")
+                route.push('/main')
+                localStorage.clear()
+            }
 
             if (response.statusText === 'OK') {
                 // alert("Invoice Created Successfully")
@@ -174,15 +182,15 @@ const InvoiceData = () => {
         const authHeader = getAuthHeader()
 
         try {
-            const res = await axios.get('https://tgc67.online/api/resource/Customer', authHeader)
+            // const res = await axios.get('https://tgc67.online/api/resource/Customer', authHeader)
+            const res = await get('/resource/Customer')
             // console.log(res.data.data)
-            setCusList(res.data.data)
+            setCusList(res.data)
         }
         catch (err) {
             console.log(err)
-            if (err.response.status === 403) {
+            if (err?.response?.status === 403) {
                 sessionStorage.clear()
-                alert("Login Expired")
                 toast.error("Login Expired")
                 route.push('/')
             }
@@ -313,6 +321,23 @@ const InvoiceData = () => {
                                                     });
                                                 }}
 
+                                            />
+                                        </div>
+
+
+                                        <div className="col-12">
+                                            <label htmlFor="remarks" className="form-label">Reference Number or Note</label>
+                                            <textarea
+                                                name="remarks"
+                                                className="form-control"
+
+                                                value={customerData.remarks}
+                                                onChange={(e) => {
+                                                    setCustomerData({
+                                                        ...customerData,
+                                                        remarks: e.target.value,
+                                                    });
+                                                }}
                                             />
                                         </div>
                                         <div className="col-12 mb-4">
@@ -516,7 +541,7 @@ const TableDataList = ({ item, removeList, handleItemChange, handleAdd, handleUp
         } catch (err) {
             console.log(err);
 
-            if (err.response.status === 403) {
+            if (err.response?.status === 403) {
                 sessionStorage.clear()
 
             }

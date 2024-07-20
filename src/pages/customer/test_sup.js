@@ -45,7 +45,7 @@ const DataTable = () => {
         } catch (err) {
             setTableData([]);
             console.log(err);
-            if (err.response.status === 403) {
+            if (err.response?.status === 403) {
                 alert("Login Expired");
                 route.push('/');
             } else {
@@ -66,7 +66,7 @@ const DataTable = () => {
             setSampleData(listRes.data.message);
         } catch (err) {
             console.log(err);
-            if (err.response.status === 403) {
+            if (err.response?.status === 403) {
                 sessionStorage.clear();
             } else {
                 handleError(err);

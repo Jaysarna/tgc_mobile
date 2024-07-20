@@ -149,7 +149,7 @@ const InvoiceData = () => {
             }
             // console.log('API Response:', response.statusText)
         } catch (error) {
-            if (error.response.status === 403) {
+            if (error.response?.status === 403) {
                 sessionStorage.clear()
             }
             else {
@@ -186,7 +186,7 @@ const InvoiceData = () => {
         }
         catch (err) {
             console.log(err)
-            if (err.response.status === 403) {
+            if (err.response?.status === 403) {
                 alert("Login Expired")
                 router.push('/')
             }

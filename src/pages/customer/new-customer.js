@@ -59,7 +59,7 @@ const NewCustomer = () => {
             // Handle any errors that occur during the request
 
             toast.error('API Error:');
-            if (error.response.status === 403) {
+            if (error.response?.status === 403) {
                 alert("Login Expired")
                 route.push('/')
             }

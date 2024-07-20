@@ -22,7 +22,7 @@ const MakeAPayment = () => {
             try {
                 const response = await axios.get(`https://tgc67.online/api/resource/Supplier/${nme}`, authHeader)
                 // console.log(response.data.data)
-                if (response.status === 200) {
+                if (response?.status === 200) {
                     const customer = response.data.data;
                     // console.log(customer)
                     setPaymentData({
@@ -33,7 +33,7 @@ const MakeAPayment = () => {
             }
             catch (err) {
                 console.log(err)
-                if (err.response.status === 403) {
+                if (err.response?.status === 403) {
                     alert("Login Expired")
                     router.push('/')
                 }
@@ -132,7 +132,7 @@ const MakeAPayment = () => {
 
         } catch (err) {
             console.log(err.response.data);
-            if (err.response.status === 403) {
+            if (err.response?.status === 403) {
                 alert("Login Expired")
                 router.push('/')
             }
@@ -181,7 +181,7 @@ const MakeAPayment = () => {
             .catch(error => {
                 console.log('error', error)
                 setTableData([])
-                if (error.response.status === 403) {
+                if (error.response?.status === 403) {
                     alert("Login Expired")
                     router.push('/')
                 }

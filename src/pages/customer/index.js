@@ -9,6 +9,7 @@ import { AddIcon, EditIcon } from '@/icons/actions';
 import { authHeader, getAuthHeader } from '@/helpers/Header';
 import { handleError } from '@/Api/showError';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import moment from 'moment';
 
 
 const ItemList = () => {
@@ -63,7 +64,7 @@ const DataTable = () => {
             setSampleData(listRes.data.message);
         } catch (err) {
             console.log(err);
-            if (err.response.status === 403) {
+            if (err.response?.status === 403) {
                 sessionStorage.clear();
             } else {
                 handleError(err);
@@ -83,9 +84,17 @@ const DataTable = () => {
 
     const columns = !sample
         ? [
-
+            { name: 'creation', label: 'Date' },
             { name: 'Customer Name', label: 'Customer Name' },
-            { name: 'Outstanding Amount', label: 'Outstanding Amount' },
+            {
+                name: 'Outstanding Amount', label: 'Outstanding Amount', options: {
+                    customBodyRender: (value) => (
+                        <>
+                            ${value}
+                        </>
+                    )
+                }
+            },
 
             {
                 name: 'Recive Payment',
@@ -97,7 +106,7 @@ const DataTable = () => {
 
                 // options: { customBodyRender: () => <EditIcon onClick={() => route.push(`/customer/${item[0]}/edit`)} /> } },
             },
-            { name: 'creation', label: 'Date' },
+
 
         ]
         : [
@@ -108,6 +117,7 @@ const DataTable = () => {
 
     const data = !sample
         ? tableData.map(item => [
+            moment(item[2]).format('DD-MM-yyyy'),
             item[0],
             item[1],
             <AddIcon
@@ -115,6 +125,7 @@ const DataTable = () => {
                 onClick={() => route.push(`/customer/${item[0]}/recive-payment`)}
             />,
             <EditIcon onClick={() => route.push(`/customer/${item[0]}/edit`)} />,
+            ,
         ])
         : sampleData.map(item => [item.customer, item.invoices.length > 0 ? "Sample" : null]);
 

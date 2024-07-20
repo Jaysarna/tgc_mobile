@@ -16,7 +16,7 @@ const Samplelist = () => {
 
   const [tableData, setTableData] = useState([])
 
-  async function fetchCsList () {
+  async function fetchCsList() {
     const authHeader = getAuthHeader()
     const apiUrl = 'https://tgc67.online/api/resource/Sales%20Invoice'
     const filters = [
@@ -38,7 +38,7 @@ const Samplelist = () => {
       setTableData(listRes.data.data)
     } catch (error) {
       console.log(error)
-      if (error.response.status === 403) {
+      if (error.response?.status === 403) {
         alert('Login Expired')
         route.push('/')
       } else {

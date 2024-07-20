@@ -51,7 +51,7 @@ const NewSupplier = () => {
         }
         catch (err) {
             console.log(err)
-            if (err.response.status === 403) {
+            if (err.response?.status === 403) {
                 sessionStorage.clear()
                 alert("Login Expired")
                 route.push('/')

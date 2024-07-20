@@ -65,7 +65,7 @@ const outstandingInvoices = () => {
             .catch(error => {
                 console.log('error', error)
                 setTableData([])
-                if (error.response.status === 403) {
+                if (error.response?.status === 403) {
                     alert("Login Expired")
                     router.push('/')
                 }

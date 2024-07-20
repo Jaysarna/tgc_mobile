@@ -10,6 +10,8 @@ import { authHeader, getAuthHeader } from '@/helpers/Header';
 import { handleError } from '@/Api/showError';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Head from 'next/head';
+import { get } from '@/configs/apiUtils';
+import moment from 'moment';
 
 const ItemList = () => {
     const [tableData, setTableData] = useState([]);
@@ -23,7 +25,7 @@ const ItemList = () => {
             ['docstatus', '=', '1'],
             ['status', '!=', 'Cancel']
         ]
-        const fields = ['name', 'customer', 'grand_total', 'outstanding_amount', 'posting_date']
+        const fields = ["name", "customer", "grand_total", "outstanding_amount", "advance_received", "posting_date"];
 
         // Construct the dynamic URL
         const url = `${apiUrl}?filters=${encodeURIComponent(
@@ -31,11 +33,12 @@ const ItemList = () => {
         )}&fields=${encodeURIComponent(JSON.stringify(fields))}`
 
         try {
-            const listRes = await axios.get(url, authHeader)
+            const res = await get(url)
+            // const listRes = await axios.get(url, authHeader)
             // console.log(listRes.data)
-            setTableData(listRes.data.data)
+            setTableData(res.data)
         } catch (err) {
-            if (err.response.status === 403) {
+            if (err?.response?.status === 403) {
                 sessionStorage.clear()
                 alert('Login Expired')
                 router.push('/')
@@ -69,12 +72,25 @@ const DataTable = ({ tableData }) => {
 
     const columns = [
         {
+            name: 'posting_date',
+            label: 'Date',
+            options: {
+                customBodyRender: (value) => {
+                    return (
+                        <>
+                            {moment(value).format('l')}
+                        </>
+                    )
+                }
+            }
+        },
+        {
             name: 'name',
             label: 'Customer Name',
             options: {
 
                 customBodyRender: (value, tableMeta) => {
-                    const name = tableMeta.rowData[1]
+                    const name = tableMeta.rowData[2]
 
                     return (
                         < div className='table-row__info' >
@@ -98,15 +114,34 @@ const DataTable = ({ tableData }) => {
 
         {
             name: 'grand_total',
-            label: 'Grand Total'
+            label: 'Grand Total',
+            options: {
+                customBodyRender: (value) => {
+                    return (
+                        <>
+                            $ {value}
+                        </>
+                    )
+                }
+            }
         },
-        {
-            name: 'posting_date',
-            label: 'Date'
-        },
+
         {
             name: 'outstanding_amount',
             label: 'Outstanding Amount',
+            options: {
+                customBodyRender: (value) => {
+                    return (
+                        <>
+                            $ {value}
+                        </>
+                    )
+                }
+            }
+        },
+        {
+            name: 'advance_received',
+            label: 'Advance Amount',
             options: {
                 customBodyRender: (value) => {
                     return (
@@ -179,7 +214,7 @@ const DataTable = ({ tableData }) => {
                                 </div>
                                 <div className='col-md-8'>
                                     All Sales Invoice List{' '}
-                                    <span className='span-user-clr'>{tableData.length}</span>
+                                    <span className='span-user-clr'>{tableData?.length}</span>
                                 </div>
                                 {/* <div className='col-md-3'>
                                 <div className='form-check'>
@@ -204,7 +239,7 @@ const DataTable = ({ tableData }) => {
                                     Total Amount{' '}
                                     <span className='span-user-clr'>
                                         {'$ '}
-                                        {tableData.length > 0
+                                        {tableData?.length > 0
                                             ? tableData.reduce(
                                                 (total, item) => total + item.outstanding_amount,
                                                 0

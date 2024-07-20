@@ -32,7 +32,7 @@ api.interceptors.request.use(config => {
 const handleApiError = error => {
     handleShowApiError(error)
     if (error.response) {
-        console.error('API Error:', error.response.status, error.response.data);
+        console.error('API Error:', error.response?.status, error.response.data);
         if (error.response.data && error.response.data.error) {
             return error.response.data.error;
         }

@@ -7,6 +7,9 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { handleError } from '@/Api/showError';
+import { get, post } from '@/configs/apiUtils';
+import toast from 'react-hot-toast';
+import Loader from '@/helpers/Loader';
 
 
 
@@ -19,19 +22,24 @@ const MakeAPayment = () => {
 
         const authHeader = getAuthHeader();
         try {
-            const response = await axios.get(`https://tgc67.online/api/method/supplier_outstanding`, authHeader)
-            // console.log(response.data)
-            if (response.status === 200) {
-                const customer = response.data.message;
-                // console.log(customer)
-                setCusList(customer)
+            const res = await get('/method/supplier_outstanding')
+            // console.log(res)
+            if (res?.message) {
+                setCusList(res?.message)
             }
+            // const response = await axios.get(`https://tgc67.online/api/method/supplier_outstanding`, authHeader)
+            // console.log(response.data)
+            // if (response?.status === 200) {
+            //     const customer = response.data.message;
+            //     // console.log(customer)
+            //     setCusList(customer)
+            // }
         }
         catch (err) {
             console.log(err)
             setCusList([])
-            if (err.response.status === 403) {
-                alert("Login Expired")
+            if (err.response?.status === 403) {
+                toast.error("Login Expired")
                 router.push('/')
             }
             else {
@@ -49,6 +57,7 @@ const MakeAPayment = () => {
         party_type: 'Supplier',
         party: '',
         paid_amount: 0,
+        remarks: '',
         paymentMethod: '',
         paymentDate: new Date().toISOString().substr(0, 30),
     });
@@ -98,6 +107,7 @@ const MakeAPayment = () => {
     };
 
     const handlePaymentSubmit = async (e) => {
+        setIsLoading(true)
         e.preventDefault();
         const authHeader = getAuthHeader();
         // console.log(paymentData)
@@ -124,33 +134,42 @@ const MakeAPayment = () => {
                 received_amount: paymentData.paid_amount,
                 source_exchange_rate: 1,
                 references: references,
-                docstatus:'1',
+                remarks: paymentData.remarks,
+                docstatus: '1',
             },
         };
 
         // console.log(paymentData1)
         try {
-            const res = await axios.post(
-                'https://tgc67.online/api/resource/Payment%20Entry',
-                paymentData1,
-                authHeader
-            );
-            // console.log(res)
-            if (res.status === 200) {
-                alert(`${res.data.data.name} Made a Payment`);
-                router.push('/supplier')
+
+            const res = await post('/resource/Payment%20Entry', paymentData1);
+            if (res?.data?.name) {
+                toast.success(`${res.data.name} Made a Payment`)
+                router.push('/customer')
             }
+            // const res = await axios.post(
+            //     'https://tgc67.online/api/resource/Payment%20Entry',
+            //     paymentData1,
+            //     authHeader
+            // );
+            // // console.log(res)
+            // if (res.status === 200) {
+            //     alert(`${res.data.data.name} Made a Payment`);
+            //     router.push('/supplier')
+            // }
 
         } catch (err) {
-            console.log(err.response.data);
+            console.log(err.response?.data);
 
-            if (err.response.status === 403) {
+            if (err.response?.status === 403) {
                 sessionStorage.clear()
             }
             else {
                 handleError(err)
             }
         }
+        setIsLoading(false)
+
 
     };
 
@@ -265,6 +284,7 @@ const MakeAPayment = () => {
 
 
     const [isActiveOutStanding, setOutStanding] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
 
@@ -275,6 +295,8 @@ const MakeAPayment = () => {
     return (
         <>
             <Siderbar />
+            {isLoading && <Loader msg='Making a Payment' />}
+
             <div>
                 <div className="col-lg-12 itemOuter mt-3">
 
@@ -336,6 +358,16 @@ const MakeAPayment = () => {
                                                 id="paid_amount"
                                                 required
                                                 value={paymentData.paid_amount}
+                                                onChange={handlePaymentDataChange}
+                                            />
+                                        </div>
+                                        <div className="col-12">
+                                            <label htmlFor="remarks" className="form-label">Reference Number or Note</label>
+                                            <textarea
+                                                name="remarks"
+                                                className="form-control"
+
+                                                value={paymentData.remarks}
                                                 onChange={handlePaymentDataChange}
                                             />
                                         </div>

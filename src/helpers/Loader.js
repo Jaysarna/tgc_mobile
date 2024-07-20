@@ -3,11 +3,11 @@ import React from 'react';
 // import loader from '../images/loader.gif'
 // import CircularProgress from '@mui/material/CircularProgress';
 
-const Loader = () => {
+const Loader = ({ msg }) => {
     return (
         <div className='loader-outer'>
 
-          <LoadingPage msg="Loading"/>
+            <LoadingPage msg={msg || "Loading"} />
 
         </div>
     );

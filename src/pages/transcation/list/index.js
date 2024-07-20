@@ -8,6 +8,8 @@ import { LoadingPage } from "@/helpers/Loader";
 import axios from "axios";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from "next/router";
+import { get } from "@/configs/apiUtils";
+import moment from "moment";
 
 const columns = [
     {
@@ -17,6 +19,15 @@ const columns = [
             filter: true,
             sort: true,
         },
+        options: {
+            customBodyRender: (value) => {
+                return (
+                    <>
+                        {moment(value).format('l')}
+                    </>
+                )
+            }
+        }
     },
     // {
     //     name: "account",
@@ -45,6 +56,14 @@ const columns = [
     {
         name: "credit_in_account_currency",
         label: "Credit",
+        options: {
+            filter: true,
+            sort: true,
+        },
+    },
+    {
+        name: "remarks",
+        label: "Notes",
         options: {
             filter: true,
             sort: true,
@@ -109,20 +128,20 @@ const Index = () => {
             try {
                 const baseURL = "https://tgc67.online/api/resource/GL%20Entry";
                 const filters = encodeURIComponent(JSON.stringify([["account", "=", "Cash - TGC"]]));
-                const fields = encodeURIComponent(JSON.stringify(["posting_date", "account", "debit_in_account_currency", "credit_in_account_currency", "against", "voucher_no"]));
+                const fields = encodeURIComponent(JSON.stringify(["posting_date", "account", "remarks", "debit_in_account_currency", "credit_in_account_currency", "against", "voucher_no"]));
                 const limit = "100000";
                 const orderBy = "posting_date";
                 const limitStart = "0";
 
                 const url = `${baseURL}?filters=${filters}&fields=${fields}&limit=${limit}&order_by=${orderBy}&limit_start=${limitStart}`;
 
-                const response = await axios.get(url, authheader);
+                const response = await get(url)
 
                 if (!response.data) {
                     throw new Error("Failed to fetch data");
                 }
 
-                setTranscation(response.data.data || []);
+                setTranscation(response?.data || []);
 
                 const totalDebit = transcation.reduce((total, item) => total + item.debit_in_account_currency, 0);
                 const totalCredit = transcation.reduce((total, item) => total + item.credit_in_account_currency, 0);

@@ -23,7 +23,7 @@ const recivepayment = () => {
           authHeader
         )
         console.log(response.data.data)
-        if (response.status === 200) {
+        if (response?.status === 200) {
           const customer = response.data.data
           // console.log(customer)
           setPaymentData({
@@ -33,7 +33,7 @@ const recivepayment = () => {
         }
       } catch (err) {
         console.log(err)
-        if (err.response.status === 403) {
+        if (err.response?.status === 403) {
           alert('Login Expired')
           router.push('/')
         } else {
@@ -130,7 +130,7 @@ const recivepayment = () => {
       }
     } catch (err) {
       console.log(err)
-      if (err.response.status === 403) {
+      if (err.response?.status === 403) {
         sessionStorage.clear()
       } else {
         handleError(err)
@@ -161,7 +161,7 @@ const recivepayment = () => {
       .catch(error => {
         console.log('error', error)
         setTableData([])
-        if (error.response.status === 403) {
+        if (error.response?.status === 403) {
           sessionStorage.clear()
         } else {
           handleError(error)

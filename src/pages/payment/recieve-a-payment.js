@@ -6,6 +6,9 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import DeleteIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import { post } from '@/configs/apiUtils';
+import toast from 'react-hot-toast';
+import Loader from '@/helpers/Loader';
 // import DeleteIcon from '@mui/icons-material/Delete';
 
 
@@ -20,7 +23,7 @@ const ReceiveAPayment = () => {
         try {
             const response = await axios.get(`https://tgc67.online/api/method/customer_outstanding`, authHeader)
             // console.log(response.data.message)
-            if (response.status === 200) {
+            if (response?.status === 200) {
                 const customer = response.data.message;
                 setCusList(customer)
 
@@ -28,7 +31,7 @@ const ReceiveAPayment = () => {
         }
         catch (err) {
             console.log(err)
-            if (err.response.status === 403) {
+            if (err.response?.status === 403) {
                 alert("Login Expired")
                 router.push('/')
             }
@@ -47,6 +50,7 @@ const ReceiveAPayment = () => {
         party: '',
         paid_amount: 0,
         paymentMethod: '',
+        remarks: '',
         paymentDate: new Date().toISOString().substr(0, 10),
 
     });
@@ -87,6 +91,7 @@ const ReceiveAPayment = () => {
 
     const handlePaymentSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true)
 
         // console.log(paymentData)
         // Create an array to store references with allocated amounts
@@ -112,32 +117,41 @@ const ReceiveAPayment = () => {
                 received_amount: paymentData.paid_amount,
                 target_exchange_rate: 1,
                 references: references,
-                docstatus: '1'
+                docstatus: '1',
+                remarks: paymentData.remarks,
             },
         };
 
-        console.log(paymentData1)
+        // console.log(paymentData1)
         try {
-            const res = await axios.post(
-                'https://tgc67.online/api/resource/Payment%20Entry',
-                paymentData1,
-                authHeader
-            );
-            // console.log(res)
-            if (res.status === 200) {
-                alert(`${res.data.data.name} Received a Payment`);
+
+            const res = await post('/resource/Payment%20Entry', paymentData1);
+            if (res?.data?.name) {
+                toast.success(`${res.data.name} Received a Payment`)
                 router.push('/customer')
             }
 
+            // const res = await axios.post(
+            //     'https://tgc67.online/api/resource/Payment%20Entry',
+            //     paymentData1,
+            //     authHeader
+            // );
+            // // console.log(res)
+            // if (res.status === 200) {
+            //     alert(`${res.data.data.name} Received a Payment`);
+            //     router.push('/customer')
+            // }
+
         } catch (err) {
-            console.log(err.response.data);
-            if (err.response.status === 403) {
+            console.log(err.response?.data);
+            if (err.response?.status === 403) {
                 sessionStorage.clear()
             }
             else {
                 handleError(err)
             }
         }
+        setIsLoading(false)
 
     };
 
@@ -177,6 +191,7 @@ const ReceiveAPayment = () => {
                 console.log('error', error)
                 setTableData([])
             });
+
     }
 
 
@@ -247,6 +262,7 @@ const ReceiveAPayment = () => {
     };
 
     const [isActiveOutStanding, setOutStanding] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
 
 
     useEffect(() => {
@@ -261,6 +277,7 @@ const ReceiveAPayment = () => {
     return (
         <>
             <Siderbar />
+            {isLoading && <Loader msg='Receiving a Payment' />}
             <div>
                 <div className="col-lg-12 itemOuter mt-3">
 
@@ -371,6 +388,16 @@ const ReceiveAPayment = () => {
                                                 id="paid_amount"
                                                 required
                                                 value={paymentData.paid_amount}
+                                                onChange={handlePaymentDataChange}
+                                            />
+                                        </div>
+                                        <div className="col-12">
+                                            <label htmlFor="remarks" className="form-label">Reference Number or Note</label>
+                                            <textarea
+                                                name="remarks"
+                                                className="form-control"
+
+                                                value={paymentData.remarks}
                                                 onChange={handlePaymentDataChange}
                                             />
                                         </div>

@@ -16,7 +16,7 @@ const useServerSideRendering = (url) => {
         const response = await axios.get(url, authHeader);
         setData(response.data);
       } catch (error) {
-        if (error.response.status === 479) {
+        if (error.response?.status === 479) {
           sessionStorage.clear()
         }
         else {

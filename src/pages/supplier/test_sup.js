@@ -27,7 +27,7 @@ const ItemList = () => {
     //         setTableData(listRes.data.message);
     //     } catch (err) {
     //         console.log(err);
-    //         if (err.response.status === 403) {
+    //         if (err.response?.status === 403) {
     //             sessionStorage.clear()
     //             alert("Login Expired")
     //             router.push('/')
@@ -73,7 +73,7 @@ const DataTable = () => {
         } catch (err) {
             setTableData([])
             console.log(err);
-            if (err.response.status === 403) {
+            if (err.response?.status === 403) {
                 alert("Login Expired")
                 route.push('/')
             }
@@ -98,7 +98,7 @@ const DataTable = () => {
             setSampleData(listRes.data.message);
         } catch (err) {
             console.log(err);
-            if (err.response.status === 403) {
+            if (err.response?.status === 403) {
                 sessionStorage.clear()
             }
             else {
