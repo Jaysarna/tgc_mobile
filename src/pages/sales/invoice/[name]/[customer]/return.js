@@ -6,6 +6,8 @@ import { authHeader, getAuthHeader } from '@/helpers/Header';
 import { uid } from 'uid';
 import withAuth from '@/customhook/withAuth';
 import { handleError } from '@/Api/showError';
+import { get } from '@/configs/apiUtils';
+import toast from 'react-hot-toast';
 
 
 
@@ -164,11 +166,11 @@ const InvoiceData = () => {
 
     async function fetchCustomerList(name, customer) {
 
-        const authHeader = getAuthHeader()
         try {
-            const res = await axios.get('https://tgc67.online/api/resource/Sales%20Invoice/' + name, authHeader)
+            const res = await get('/resource/Sales%20Invoice/' + name)
+            // const res = await axios.get('https://tgc67.online/api/resource/Sales%20Invoice/' + name, authHeader)
             // console.log(res.data.data)
-            const itemsArr = res.data.data.items;
+            const itemsArr = res.data.items;
             const itemsWithUuid = itemsArr.map(item => ({
                 ...item,
                 uid: uid(),
@@ -191,7 +193,7 @@ const InvoiceData = () => {
             console.log(err)
             setCusList([])
             if (err.response?.status === 403) {
-                alert("Login Expired")
+                toast.error("Login Expired")
                 route.push('/')
             }
             else {

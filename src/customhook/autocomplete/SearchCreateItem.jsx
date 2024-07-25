@@ -13,6 +13,7 @@ export default function SearchCreateItem({ selectList, uid, quantity, handleAddN
     const filter = createFilterOptions();
 
     const handleAutocompleteChange = (event, newValue) => {
+
         if (newValue && newValue.inputValue) {
             setOpenDialog(true);
             // console.log(newValue)
@@ -55,7 +56,7 @@ export default function SearchCreateItem({ selectList, uid, quantity, handleAddN
         <div className="col-12">
             <Autocomplete
                 size='small'
-                defaultValue={value}
+                defaultValue={value || localStorage.getItem('saleItem')}
                 onChange={handleAutocompleteChange}
                 filterOptions={(options, params) => {
                     const filtered = filter(options, params);

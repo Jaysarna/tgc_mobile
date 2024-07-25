@@ -93,7 +93,7 @@ const DataTable = ({ tableData }) => {
                     const name = tableMeta.rowData[2]
 
                     return (
-                        < div className='table-row__info' >
+                        <div className='table-row__info' style={{ cursor: 'pointer' }}>
                             <p className='table-row__name'>{name}</p>
                             <span className='table-row__small ms-1'>{value}</span>
                         </div >
@@ -172,8 +172,8 @@ const DataTable = ({ tableData }) => {
             label: 'Return',
             options: {
                 customBodyRender: (dataIndex, tableMeta) => {
-                    const name = tableMeta.rowData[1]
-                    const invoice = tableMeta.rowData[0]
+                    const name = tableMeta.rowData[2]
+                    const invoice = tableMeta.rowData[1]
                     return (
                         <button className="btn btn-primary" onClick={() => {
                             router.push(`/sales/invoice/${invoice}/${name}/return`)

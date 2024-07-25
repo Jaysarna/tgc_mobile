@@ -84,7 +84,17 @@ const DataTable = () => {
 
     const columns = !sample
         ? [
-            { name: 'Date ', },
+            {
+                name: 'Date ', options: {
+                    customBodyRender: (value) => {
+                        return (
+                            <div>
+                                {moment(value).format('l')}
+                            </div>
+                        )
+                    }
+                }
+            },
             { name: 'Supplier Name', },
             {
                 name: 'Outstanding Amount', options: {

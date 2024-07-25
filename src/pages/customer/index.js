@@ -1,67 +1,41 @@
-// Import necessary libraries and components
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Siderbar from '../../helpers/siderbar';
-import withAuth from '@/customhook/withAuth';
 import { useRouter } from 'next/router';
-import MUIDataTable from 'mui-datatables'
-import { AddIcon, EditIcon } from '@/icons/actions';
-import { authHeader, getAuthHeader } from '@/helpers/Header';
-import { handleError } from '@/Api/showError';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import MUIDataTable from 'mui-datatables';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import moment from 'moment';
+import { get } from '@/configs/apiUtils';
+import { AddIcon, EditIcon } from '@/icons/actions';
+import { handleError } from '@/Api/showError';
 
-
-const ItemList = () => {
-
-    return (
-        <div>
-            <Siderbar />
-            <DataTable />
-        </div>
-    );
-};
-
-export default withAuth(ItemList);
-
-
-
-// DataTable Component
 const DataTable = () => {
-    const [sample, setSample] = useState(0);
-    const route = useRouter();
-
+    const router = useRouter();
     const [tableData, setTableData] = useState([]);
     const [sampleData, setSampleData] = useState([]);
+    const [sample, setSample] = useState(0);
+    const [rowId, setRowId] = useState(false)
+    const [customerData, setCustomerData] = useState('')
 
     async function fetchCsList() {
-        const authHeader = getAuthHeader();
-
         try {
-            const listRes = await axios.get('https://tgc67.online/api/method/customer_outstanding', authHeader);
-            setTableData(listRes.data.message);
+            const listRes = await get('/method/customer_outstanding');
+            setTableData(listRes.message);
         } catch (err) {
             setTableData([]);
             console.log(err);
             if (err.response?.status === 403) {
                 alert("Login Expired");
-                route.push('/');
+                router.push('/');
             } else {
                 handleError(err);
             }
         }
     }
 
-    useEffect(() => {
-        fetchCsList();
-    }, []);
-
     async function fetchSampleCustomerList() {
-        const authHeader = getAuthHeader();
-
         try {
-            const listRes = await axios.get('https://tgc67.online/api/method/customer_with_samples', authHeader);
-            setSampleData(listRes.data.message);
+            const listRes = await get('/method/customer_with_samples');
+            setSampleData(listRes.message);
         } catch (err) {
             console.log(err);
             if (err.response?.status === 403) {
@@ -82,12 +56,45 @@ const DataTable = () => {
         }
     };
 
+    useEffect(() => {
+        fetchCsList();
+    }, []);
+
+
+    async function fetchTransactionList() {
+        try {
+            const customerId = data[rowId][1];
+            const res = await get(`https://tgc67.online/api/resource/GL%20Entry?filters=[["account", "=", "Debtors - TGC"],["party_type","=","Customer"],["party", "=", "${customerId}"]]&fields=["posting_date","account","debit_in_account_currency","credit_in_account_currency","against","voucher_no"]&limit=20&order_by=posting_date&limit_start=0`);
+            // console.log(res);
+            setCustomerData(res?.data)
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    useEffect(() => {
+        fetchTransactionList()
+    }, [rowId])
+
+
     const columns = !sample
         ? [
             { name: 'creation', label: 'Date' },
-            { name: 'Customer Name', label: 'Customer Name' },
             {
-                name: 'Outstanding Amount', label: 'Outstanding Amount', options: {
+                name: 'Customer Name',
+                label: 'Customer Name',
+                options: {
+                    customBodyRender: (value, tableMeta) => (
+                        <div>
+                            {value}
+                        </div>
+                    )
+                }
+            },
+            {
+                name: 'Outstanding Amount',
+                label: 'Outstanding Amount',
+                options: {
                     customBodyRender: (value) => (
                         <>
                             ${value}
@@ -95,19 +102,28 @@ const DataTable = () => {
                     )
                 }
             },
-
             {
                 name: 'Receive Payment',
                 filter: false,
-                // options: { customBodyRender: () => <AddIcon className='plus-icon-btn' onClick={() => route.push(`/customer/${item[0]}/recive-payment`)} /> }
+                options: {
+                    customBodyRender: (value, tableMeta) => (
+                        <AddIcon
+                            className="plus-icon-btn"
+                            onClick={() => router.push(`/customer/${tableMeta.rowData[0]}/recive-payment`)}
+                        />
+                    )
+                }
             },
             {
                 name: 'Edit',
-
-                // options: { customBodyRender: () => <EditIcon onClick={() => route.push(`/customer/${item[0]}/edit`)} /> } },
-            },
-
-
+                options: {
+                    customBodyRender: (value, tableMeta) => (
+                        <EditIcon
+                            onClick={() => router.push(`/customer/${tableMeta.rowData[0]}/edit`)}
+                        />
+                    )
+                }
+            }
         ]
         : [
             { name: 'Customer Name', label: 'Customer Name' },
@@ -120,12 +136,8 @@ const DataTable = () => {
             moment(item[2]).format('DD-MM-yyyy'),
             item[0],
             item[1],
-            <AddIcon
-                className="plus-icon-btn"
-                onClick={() => route.push(`/customer/${item[0]}/recive-payment`)}
-            />,
-            <EditIcon onClick={() => route.push(`/customer/${item[0]}/edit`)} />,
-            ,
+            item[0],
+            item[0],
         ])
         : sampleData.map(item => [item.customer, item.invoices.length > 0 ? "Sample" : null]);
 
@@ -137,10 +149,26 @@ const DataTable = () => {
                 noMatch: 'No Records Found',
             },
         },
+        print: false,
+        expandableRows: true,
+        expandableRowsOnClick: true,
+        renderExpandableRow: (rowData, rowMeta) => {
+            const colSpan = rowData.length + 1;
+            setRowId(rowMeta?.rowIndex)
 
-        print: false
+            return (
+                <tr>
+                    <td colSpan={colSpan}>
+                        <div style={{ padding: '25px' }}>
+                            <GLTable customerData={customerData} />
+                        </div>
+                    </td>
+                </tr>
+            );
+
+
+        }
     };
-
 
     return (
         <div className='table-vw-size mbvw-tbl-scrl'>
@@ -151,16 +179,15 @@ const DataTable = () => {
                             <div
                                 className='p-2'
                                 onClick={() => {
-                                    route.push('/main')
+                                    router.push('/main');
                                 }}
                                 style={{ cursor: 'pointer' }}
                             >
                                 <ArrowBackIcon className='' />
                             </div>
                             <div className='col-md-5'>
-                                Customer List<span className="span-user-clr">{tableData.length}</span>
+                                Customer List<span className="span-user-clr">{tableData?.length}</span>
                             </div>
-
                             <div className="col-md-12">
                                 <div className="form-check">
                                     <input
@@ -176,23 +203,68 @@ const DataTable = () => {
                                     </strong>
                                 </div>
                             </div>
-                            {/* <div className="col-md-12">
-                                <div className="btn btn-primary iconOuter" onClick={() => {
-                                    route.push('/customer/new-customer')
-                                }}  >
-                                    <i className="bi bi-plus-circle"></i>
-                                </div>
-                            </div> */}
                         </h6>
-
-
                     </div>
                 }
                 data={data}
                 columns={columns}
                 options={options}
             />
-            {/* <Pagination /> */}
         </div>
+    );
+};
+
+export default DataTable;
+
+
+
+
+const GLTable = ({ customerData }) => {
+
+
+    const glColumns = [
+        {
+            name: 'posting_date', label: 'Posting Date', options: {
+                customBodyRender: (value, tableMeta) => (
+
+                    <>
+                        {moment(value).format('DD-MM-yyyy')}
+                    </>
+                )
+            }
+        },
+        { name: 'account', label: 'Account' },
+        { name: 'debit_in_account_currency', label: 'Debit' },
+        { name: 'credit_in_account_currency', label: 'Credit' },
+        { name: 'against', label: 'Against' },
+        { name: 'voucher_no', label: 'Voucher No.' },
+    ];
+
+
+
+    return (
+        <MUIDataTable
+            title=""
+            data={customerData || []}
+            columns={glColumns}
+            options={{
+                filterType: 'dropdown',
+                search: false,
+                download: false,
+                filter: false,
+                responsive: 'standard',
+                selectableRows: 'none',
+                viewColumns: false,
+                pagination: false,
+                elevation: 0,
+
+                textLabels: {
+                    body: {
+                        noMatch: 'No GL Entries Found',
+                    },
+                },
+                print: false
+            }}
+        />
     );
 };

@@ -39,6 +39,15 @@ const ItemList = () => {
       },
     },
     {
+      name: 'posting_date',
+      label: 'Last Date',
+      options: {
+        customBodyRender: value => {
+          return <> {value ? moment(value).format('DD-MM-YYYY') : 'N/A'}</>
+        }
+      }
+    },
+    {
       name: 'item_name',
       label: 'Item',
       options: {
@@ -54,15 +63,7 @@ const ItemList = () => {
         }
       }
     },
-    {
-      name: 'posting_date',
-      label: 'Last Date',
-      options: {
-        customBodyRender: value => {
-          return <> {value ? moment(value).format('DD-MM-YYYY') : 'N/A'}</>
-        }
-      }
-    },
+
     {
       name: 'actual_qty',
       label: 'QTY Purchased'
@@ -101,8 +102,8 @@ const ItemList = () => {
               style={{ maxWidth: '130px', padding: '4px !important' }}
               onClick={() => {
                 localStorage.setItem('saleItem', value)
-                localStorage.setItem('saleQuan', tableMeta.rowData[1])
-                localStorage.setItem('saleRate', tableMeta.rowData[3])
+                localStorage.setItem('saleQuan', tableMeta.rowData[3])
+                localStorage.setItem('saleRate', tableMeta.rowData[4])
                 router.push('/sales/invoice/new-invoice')
               }}
             >

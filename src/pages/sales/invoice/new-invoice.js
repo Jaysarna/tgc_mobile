@@ -19,6 +19,7 @@ import { handleShowApiError } from '@/features/error/getErrorApi';
 import { Autocomplete } from '@mui/material';
 import toast from 'react-hot-toast';
 import { get, post } from '@/configs/apiUtils';
+import { calculateDiscount } from '@/helpers/discount';
 
 
 let name = "Customer"
@@ -43,6 +44,7 @@ const InvoiceData = () => {
         advance_recieved: 0,
         custom_sample: 0,
         remarks: '',
+        discount: 0,
         items: [{
             uid: uid(),
             item_code: localStorage.getItem('saleItem') ? localStorage.getItem('saleItem') : '',
@@ -238,6 +240,20 @@ const InvoiceData = () => {
         fetchCustomerList()
     }, [])
 
+
+    const [totalAmount, setTotalAmount] = useState(0)
+    const [totalQuan, setTotalQuan] = useState(1);
+
+
+
+    useEffect(() => {
+        // console.log(itemList)
+        setTotalAmount(customerData.items.reduce((total, item) => total + item.rate * item.quantity, 0))
+        setTotalQuan(customerData.items.reduce((total, item) => parseFloat(total) + parseFloat(item.quantity), 0))
+    }, [customerData.items]);
+
+
+
     const [isLoading, setLoading] = useState(false)
 
     return (
@@ -325,21 +341,7 @@ const InvoiceData = () => {
                                         </div>
 
 
-                                        <div className="col-12">
-                                            <label htmlFor="remarks" className="form-label">Reference Number or Note</label>
-                                            <textarea
-                                                name="remarks"
-                                                className="form-control"
 
-                                                value={customerData.remarks}
-                                                onChange={(e) => {
-                                                    setCustomerData({
-                                                        ...customerData,
-                                                        remarks: e.target.value,
-                                                    });
-                                                }}
-                                            />
-                                        </div>
                                         <div className="col-12 mb-4">
                                             <div className="form-check">
                                                 <input
@@ -359,7 +361,6 @@ const InvoiceData = () => {
                                         <DataTable
                                             head={[
                                                 "Item Name",
-
                                                 "Quantity.",
                                                 "Rate",
                                                 "Amount",
@@ -376,6 +377,69 @@ const InvoiceData = () => {
                                                 addNewCustomer({ customerName: updatedValue })
                                             }}
                                         />
+                                        <div className="row mt-4" style={{ marginLeft: '0px', marginRight: '0px', padding: '10px' }}>
+                                            <div className="col-6 col-md-4 mb-2">
+                                                <label htmlFor="Discount" className="form-label">Discount (%)</label>
+                                                <input
+                                                    type="number"
+                                                    className='form-control'
+                                                    value={customerData.discount}
+                                                    placeholder="Total Amount"
+                                                    onChange={(e) => {
+                                                        setCustomerData({
+                                                            ...customerData,
+                                                            discount: e.target.value
+                                                        })
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="col-6 col-md-3">
+                                                <label htmlFor="discount" className="form-label">Discount ($)</label>
+                                                <input
+                                                    type="number"
+                                                    className='form-control'
+                                                    value={calculateDiscount(totalAmount, customerData.discount)}
+                                                    placeholder="Total Amount"
+                                                    readOnly
+                                                />
+                                            </div>
+                                            <div className="col-6 col-md-3">
+                                                <label htmlFor="Net Amount" className="form-label">Net Amount ($)</label>
+                                                <input
+                                                    type="number"
+                                                    className='form-control'
+                                                    value={totalAmount - calculateDiscount(totalAmount, customerData.discount)}
+                                                    placeholder="Total Amount"
+                                                    readOnly
+                                                />
+                                            </div>
+
+                                            <div className="col-6 col-md-3">
+                                                <label htmlFor="total Quantity" className="form-label">Total Quantity</label>
+                                                <input
+                                                    type="number"
+                                                    className='form-control'
+                                                    value={parseFloat(totalQuan)}
+                                                    placeholder="Total Quantity"
+                                                    readOnly
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-12">
+                                            <label htmlFor="remarks" className="form-label">Reference Number or Note</label>
+                                            <textarea
+                                                name="remarks"
+                                                className="form-control"
+
+                                                value={customerData.remarks}
+                                                onChange={(e) => {
+                                                    setCustomerData({
+                                                        ...customerData,
+                                                        remarks: e.target.value,
+                                                    });
+                                                }}
+                                            />
+                                        </div>
 
                                         <div className="w-100">
                                             <button className="btn btn-primary login-btn" type="submit">Create Invoice</button>
@@ -451,8 +515,8 @@ const DataTable = ({ head, itemList, addNewItem, removeList, handleItemChange, h
                             <button className="btn btn-primary new-row login-btn" type="button" onClick={() => addNewItem()} >New Row</button>
 
                         </div>
-                        <div className="row mt-4" style={{ marginLeft: '0px', marginRight: '0px', padding: '10px' }}>
-                            <div className="col-5 mb-4">
+                        {/* <div className="row mt-4" style={{ marginLeft: '0px', marginRight: '0px', padding: '10px' }}>
+                            <div className="col-5">
                                 <label htmlFor="Total Amount" className="form-label">Total Amount </label>
                                 <input
                                     type="number"
@@ -462,7 +526,7 @@ const DataTable = ({ head, itemList, addNewItem, removeList, handleItemChange, h
                                     readOnly
                                 />
                             </div>
-                            <div className="col-5 mb-4">
+                            <div className="col-5">
                                 <label htmlFor="total Quantity" className="form-label">Total Quantity</label>
                                 <input
                                     type="number"
@@ -472,7 +536,7 @@ const DataTable = ({ head, itemList, addNewItem, removeList, handleItemChange, h
                                     readOnly
                                 />
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
                 <br />
