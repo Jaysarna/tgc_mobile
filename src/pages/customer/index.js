@@ -233,7 +233,7 @@ const GLTable = ({ customerData }) => {
                 )
             }
         },
-        { name: 'account', label: 'Account' },
+        // { name: 'account', label: 'Account' },
         { name: 'debit_in_account_currency', label: 'Debit' },
         { name: 'credit_in_account_currency', label: 'Credit' },
         { name: 'against', label: 'Against' },

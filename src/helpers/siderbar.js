@@ -1,6 +1,12 @@
+import { get } from '@/configs/apiUtils';
+import { fetchOutstanding } from '@/customhook/outstanding';
+import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Drawer, IconButton, List, Typography } from '@mui/material';
 import axios from 'axios';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+
 
 var user;
 
@@ -223,25 +229,147 @@ export { ContextMenu }
 
 const Notification = () => {
 
-    const [isOpenNotify, setOpenNotify] = useState(false)
+    const [isOpenNotify, setOpenNotify] = useState(false);
+
+
+    function handleClose() {
+        setOpenNotify(false)
+    }
+    function handleOpen() {
+        setOpenNotify(true)
+    }
+
+    const [notifications, setNotifications] = useState([])
+
+    async function fetchNotification() {
+        try {
+            const res = await get('/resource/Notification%20Log?order_by=creation%20desc&limit=10&fields=["name","subject","email_content"]');
+            setNotifications(res?.data)
+            // console.log(res)
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    useEffect(() => {
+        fetchNotification()
+    }, [])
+
+
     return (
         <>
 
             <div className="notification-outer">
 
 
-                <div className="bell-outer" onClick={() => setOpenNotify(!isOpenNotify)}>
+                <div className="bell-outer" onClick={() => handleOpen()}>
                     <div className="col-md-2">
-                        <button className="btn btn-primary bell-icon"><i className="bi bi-bell"></i></button>
+                        <button className="btn btn-primary bell-icon"><i className="bi bi-bell"></i><spna className='notify-count'>{notifications?.length}</spna></button>
                     </div>
 
                 </div>
-                {<div className={`notification-wrapper${isOpenNotify ? '-active' : ''} card`}>
-                    <li>This is notificaton This is notificaton This is notificaton This is notificaton</li>
-                    <li>This is notificaton</li>
-                </div>}
+                <>
+                    {/* <Button onClick={() => handleOpen()}>open</Button> */}
+                    <Drawer
+                        anchor={'right'}
+                        open={isOpenNotify}
+                        onClose={() => handleClose()}
+                        className='notification-drawer'
+                    >
+                        <h3 className='text-center mt-2'>Notifications</h3>
+                        <hr />
+
+                        {
+                            notifications?.length > 0 && notifications?.map((notify) => {
+                                return (
+                                    <NotificatonList noteData={notify} />
+                                )
+                            })
+                        }
+
+
+                    </Drawer>
+                </>
             </div>
         </>
 
     )
 }
+
+
+
+// const CustomChip = ({ document_type }) => {
+//     return (
+//         <div className='custom-chip'>
+
+//             <Chip label="success" color="success" />
+//         </div>
+//     )
+// }
+
+
+
+
+const NotificatonList = ({ noteData }) => {
+
+    const [isOpen, setOpen] = useState(false)
+
+
+    async function markAsRead() {
+
+        try {
+            const res = await get(`/method/tgc_custom.server_script.has_seen.update_seen?notification_id=${noteData?.name}`)
+            console.log(res)
+            toast.success(res?.message)
+        }
+        catch (err) {
+            console.log(err)
+        }
+
+    }
+
+    const handleOpen = () => {
+        setOpen(true)
+        markAsRead()
+    };
+    const handleClose = () => setOpen(false);
+
+    return (
+        <>
+            <div className='notifications' onClick={handleOpen}>
+
+                <div className='notify-dot'></div>
+
+                <div className='text-container'>
+                    <h2 className='limit-1'>{noteData?.subject}</h2>
+                    <p className='limit-2'>{noteData?.email_content}</p>
+                </div>
+                {/* <div className='d-flex'>
+        <CustomChip document_type={'normal'} />
+        <button className=" bell-icon"><i className="bi bi-bell"></i></button>
+
+    </div> */}
+
+            </div>
+
+            <Dialog onClose={handleClose} open={isOpen} sx={{ p: 4 }}>
+                <DialogTitle sx={{ color: '#7f56d9', fontSize: '18px' }}>{noteData?.subject}</DialogTitle>
+                <DialogContent>
+                    <Typography gutterBottom sx={{ color: "#666", fontSize: '14px' }}>
+                        {noteData?.email_content}
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button autoFocus onClick={handleClose}>
+                        cancel
+                    </Button>
+                </DialogActions>
+            </Dialog >
+        </>
+    )
+}
+
+
+
+
+

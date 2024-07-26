@@ -409,11 +409,20 @@ const InvoiceData = () => {
                                                     type="number"
                                                     className='form-control'
                                                     value={totalAmount - calculateDiscount(totalAmount, customerData.discount)}
+                                                    placeholder="Net Amount"
+                                                    readOnly
+                                                />
+                                            </div>
+                                            <div className="col-5">
+                                                <label htmlFor="Total Amount" className="form-label">Total Amount </label>
+                                                <input
+                                                    type="number"
+                                                    className='form-control'
+                                                    value={totalAmount}
                                                     placeholder="Total Amount"
                                                     readOnly
                                                 />
                                             </div>
-
                                             <div className="col-6 col-md-3">
                                                 <label htmlFor="total Quantity" className="form-label">Total Quantity</label>
                                                 <input

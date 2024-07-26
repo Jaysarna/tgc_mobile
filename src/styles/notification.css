@@ -2,11 +2,78 @@
   cursor: pointer;
 }
 
-.notification-outer {
-  /* position: absolute;
+/* .notification-outer {
+
+} */
+
+.notify-count {
+  position: absolute;
+  font-size: 12px;
+  right: 20px;
+  top: 0px;
+}
+
+.notification-drawer {
+  position: relative;
+  /* width: 300px; */
+  .css-1160xiw-MuiPaper-root-MuiDrawer-paper {
+    max-width: 320px;
     width: 100%;
-    height: 100%;
-    z-index: -1; */
+  }
+
+  .notifications {
+    width: 100%;
+    cursor: pointer;
+    text-decoration: none;
+
+    border-bottom: solid 1px #7f56d9;
+
+    background-color: #fff;
+    padding: 10px;
+    /* background-color: #a981ff4a; */
+
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 15px;
+
+    .notify-dot {
+      width: 5px;
+      height: 5px;
+
+      background-color: #7f56d9;
+      border-radius: 50%;
+    }
+
+    .text-container {
+      width: 90%;
+    }
+
+    h2 {
+      color: #7f56d9;
+      margin-bottom: 0.5em;
+      font-size: 1rem;
+    }
+
+    p {
+      color: #666;
+      font-size: 0.8rem;
+      margin-bottom: 15px;
+    }
+
+    a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.custom-chip {
+  font-size: 11px;
 }
 
 .bell-outer {
@@ -42,4 +109,22 @@
   z-index: 1;
   right: 10px;
   display: block;
+}
+
+/* text limit */
+.text-limit,
+.limit-1,
+.limit-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.limit-1 {
+  -webkit-line-clamp: 1;
+}
+.limit-2 {
+  -webkit-line-clamp: 2;
 }

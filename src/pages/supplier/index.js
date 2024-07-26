@@ -11,11 +11,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import moment from 'moment';
 import { get } from '@/configs/apiUtils';
 
-
-
 const ItemList = () => {
-    const router = useRouter();
-
     return (
         <div>
             <Siderbar />
@@ -26,17 +22,17 @@ const ItemList = () => {
 
 export default withAuth(ItemList);
 
-// DataTable Component
 const DataTable = () => {
+    const router = useRouter();
     const [tableData, setTableData] = useState([]);
     const [sampleData, setSampleData] = useState([]);
     const [sample, setSample] = useState(0);
-    const route = useRouter();
+    const [rowId, setRowId] = useState(false);
+    const [supplierData, setSupplierData] = useState('');
 
     async function fetchData() {
-        const authHeader = getAuthHeader();
-
         try {
+            const authHeader = getAuthHeader();
             const listRes = await axios.get('https://tgc67.online/api/method/supplier_outstanding', authHeader);
             setTableData(listRes.data.message);
         } catch (err) {
@@ -51,13 +47,9 @@ const DataTable = () => {
     }
 
     async function fetchSampleData() {
-        const authHeader = getAuthHeader();
-
         try {
-            const listRes = await get('supplier_with_samples')
-            // const listRes = await axios.get('https://tgc67.online/api/method/supplier_with_samples', authHeader);
-            console.log(listRes.data.message)
-            setSampleData(listRes.data.message);
+            const listRes = await get('supplier_with_samples');
+            setSampleData(listRes.message);
         } catch (err) {
             console.log(err);
             if (err.response?.status === 403) {
@@ -67,10 +59,6 @@ const DataTable = () => {
             }
         }
     }
-
-    useEffect(() => {
-        fetchData();
-    }, []);
 
     const handleSample = () => {
         if (sample === 0) {
@@ -82,41 +70,72 @@ const DataTable = () => {
         }
     };
 
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    async function fetchTransactionList() {
+        try {
+            const supplierId = data[rowId][1];
+            const res = await get(`https://tgc67.online/api/resource/GL%20Entry?filters=[["account", "=", "Creditors - TGC"],["party_type","=","Supplier"],["party", "=", "${supplierId}"]]&fields=["posting_date","account","debit_in_account_currency","credit_in_account_currency","against","voucher_no"]&limit=20&order_by=posting_date&limit_start=0`);
+            setSupplierData(res?.data);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    useEffect(() => {
+        fetchTransactionList();
+    }, [rowId]);
+
     const columns = !sample
         ? [
             {
-                name: 'Date ', options: {
-                    customBodyRender: (value) => {
-                        return (
-                            <div>
-                                {moment(value).format('l')}
-                            </div>
-                        )
-                    }
+                name: 'Date',
+                options: {
+                    customBodyRender: (value) => (
+                        <div>
+                            {moment(value).format('l')}
+                        </div>
+                    )
                 }
             },
-            { name: 'Supplier Name', },
+            { name: 'Supplier Name' },
             {
-                name: 'Outstanding Amount', options: {
-                    customBodyRender: (value) => {
-                        return (
-                            <>$ {value}
-                            </>
-                        )
-                    }
+                name: 'Outstanding Amount',
+                options: {
+                    customBodyRender: (value) => (
+                        <>$ {value}</>
+                    )
                 }
             },
-            { name: 'Make a Payment', },
-            { name: 'Edit ', },
-
+            {
+                name: 'Make a Payment',
+                options: {
+                    customBodyRender: (value, tableMeta) => (
+                        <AddIcon
+                            className="plus-icon-btn"
+                            onClick={() => router.push(`/supplier/${tableMeta.rowData[1]}/make-payment`)}
+                        />
+                    )
+                }
+            },
+            {
+                name: 'Edit',
+                options: {
+                    customBodyRender: (value, tableMeta) => (
+                        <EditIcon
+                            onClick={() => router.push(`/supplier/${tableMeta.rowData[1]}/edit`)}
+                        />
+                    )
+                }
+            }
         ]
         : [
             {
                 name: 'Supplier',
                 options: {
-                    customBodyRender: (value) => (
-                        <div>{value}</div>
-                    )
+                    customBodyRender: (value) => <div>{value}</div>
                 }
             },
             {
@@ -137,38 +156,21 @@ const DataTable = () => {
                         </div>
                     )
                 }
-            },
-
+            }
         ];
-
 
     const data = !sample
         ? tableData.map(item => [
             item[2],
             item[0],
             item[1],
-
-            <AddIcon
-                className="plus-icon-btn"
-                onClick={() => route.push(`/supplier/${item[0]}/make-payment`)}
-            />,
-            <EditIcon onClick={() => route.push(`/supplier/${item[0]}/edit`)} />,
+            item[0],
+            item[0]
         ])
         : sampleData.map(item => [
             item.supplier,
-            item.invoices,
             item.invoices
         ]);
-    // sampleData.map(item => [
-    //     item.supplier,
-    //     item.invoices.length > 0 ? (
-    //         <ArrowDropDownIcon
-    //             onClick={() => {
-    //                 // Handle expanding invoice details
-    //             }}
-    //         />
-    //     ) : null,
-    // ]);
 
     const options = {
         filterType: 'dropdown',
@@ -179,14 +181,26 @@ const DataTable = () => {
             },
         },
         print: false,
+        expandableRows: true,
+        expandableRowsOnClick: true,
+        renderExpandableRow: (rowData, rowMeta) => {
+            const colSpan = rowData.length + 1;
+            setRowId(rowMeta?.rowIndex);
 
+            return (
+                <tr>
+                    <td colSpan={colSpan}>
+                        <div style={{ padding: '25px' }}>
+                            <GLTable supplierData={supplierData} />
+                        </div>
+                    </td>
+                </tr>
+            );
+        }
     };
 
     return (
-
-        // <div className='container'>
         <div className='table-vw-size mbvw-tbl-scrl'>
-
             <MUIDataTable
                 title={
                     <div className="container row p-3">
@@ -194,16 +208,15 @@ const DataTable = () => {
                             <div
                                 className='p-2'
                                 onClick={() => {
-                                    route.push('/main')
+                                    router.push('/main');
                                 }}
                                 style={{ cursor: 'pointer' }}
                             >
                                 <ArrowBackIcon className='' />
                             </div>
                             <div className='col-md-5'>
-                                Supplier List<span className="span-user-clr">{tableData.length}</span>
+                                Supplier List<span className="span-user-clr">{tableData?.length}</span>
                             </div>
-
                             <div className="col-md-12">
                                 <div className="form-check">
                                     <input
@@ -214,7 +227,7 @@ const DataTable = () => {
                                         checked={sample === 1}
                                         onChange={handleSample}
                                     />
-                                    <strong className="form-check-strong" htmlFor="docStatusCheckbox">
+                                    <strong className="form-check-strong " htmlFor="docStatusCheckbox" style={{ marginTop: '3px' }}>
                                         Sample
                                     </strong>
                                 </div>
@@ -225,12 +238,53 @@ const DataTable = () => {
                 data={data}
                 columns={columns}
                 options={options}
-
             />
-
-
         </div>
-
     );
 };
 
+const GLTable = ({ supplierData }) => {
+    const glColumns = [
+        {
+            name: 'posting_date',
+            label: 'Posting Date',
+            options: {
+                customBodyRender: (value, tableMeta) => (
+                    <>
+                        {moment(value).format('DD-MM-yyyy')}
+                    </>
+                )
+            }
+        },
+        // { name: 'account', label: 'Account' },
+        { name: 'debit_in_account_currency', label: 'Debit' },
+        { name: 'credit_in_account_currency', label: 'Credit' },
+        { name: 'against', label: 'Against' },
+        { name: 'voucher_no', label: 'Voucher No.' },
+    ];
+
+    return (
+        <MUIDataTable
+            title=""
+            data={supplierData || []}
+            columns={glColumns}
+            options={{
+                filterType: 'dropdown',
+                search: false,
+                download: false,
+                filter: false,
+                responsive: 'standard',
+                selectableRows: 'none',
+                viewColumns: false,
+                pagination: false,
+                elevation: 0,
+                textLabels: {
+                    body: {
+                        noMatch: 'No GL Entries Found',
+                    },
+                },
+                print: false
+            }}
+        />
+    );
+};
