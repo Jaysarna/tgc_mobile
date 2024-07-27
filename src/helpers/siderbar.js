@@ -230,7 +230,7 @@ export { ContextMenu }
 const Notification = () => {
 
     const [isOpenNotify, setOpenNotify] = useState(false);
-
+    const [totalCount, setTotal] = useState(0)
 
     function handleClose() {
         setOpenNotify(false)
@@ -241,10 +241,24 @@ const Notification = () => {
 
     const [notifications, setNotifications] = useState([])
 
+
+    function countUnseenMessages(data) {
+        let unseenCount = 0;
+        data.forEach(message => {
+            if (message._seen === null) {
+                unseenCount++;
+            }
+        });
+        return unseenCount;
+    }
+
+
     async function fetchNotification() {
         try {
-            const res = await get('/resource/Notification%20Log?order_by=creation%20desc&limit=10&fields=["name","subject","email_content"]');
+            const res = await get('/resource/Notification%20Log?order_by=creation%20desc&limit=10&fields=["name","subject","email_content","_seen"]');
             setNotifications(res?.data)
+            const count = countUnseenMessages(res?.data)
+            setTotal(count)
             // console.log(res)
         } catch (err) {
             console.log(err)
@@ -264,32 +278,35 @@ const Notification = () => {
 
                 <div className="bell-outer" onClick={() => handleOpen()}>
                     <div className="col-md-2">
-                        <button className="btn btn-primary bell-icon"><i className="bi bi-bell"></i><spna className='notify-count'>{notifications?.length}</spna></button>
+                        <button className="btn btn-primary bell-icon"><spna className='notify-count'>{totalCount}</spna><i className="bi bi-bell"></i></button>
                     </div>
 
                 </div>
-                <>
-                    {/* <Button onClick={() => handleOpen()}>open</Button> */}
-                    <Drawer
-                        anchor={'right'}
-                        open={isOpenNotify}
-                        onClose={() => handleClose()}
-                        className='notification-drawer'
-                    >
-                        <h3 className='text-center mt-2'>Notifications</h3>
-                        <hr />
 
-                        {
-                            notifications?.length > 0 && notifications?.map((notify) => {
-                                return (
-                                    <NotificatonList noteData={notify} />
-                                )
-                            })
-                        }
+                {/* <Button onClick={() => handleOpen()}>open</Button> */}
+                <Drawer
+                    anchor={'right'}
+                    open={isOpenNotify}
+                    onClose={() => handleClose()}
+                    className='notification-drawer'
+                >
+                    <h3 className='text-center mt-2'>Notifications</h3>
+                    <hr />
+
+                    {
+                        notifications?.length > 0 && notifications?.map((notify) => {
+                            return (
+                                <NotificatonList
+                                    noteData={notify}
+                                    fetchNotification={fetchNotification}
+                                />
+                            )
+                        })
+                    }
 
 
-                    </Drawer>
-                </>
+                </Drawer>
+
             </div>
         </>
 
@@ -310,7 +327,7 @@ const Notification = () => {
 
 
 
-const NotificatonList = ({ noteData }) => {
+const NotificatonList = ({ noteData, fetchNotification }) => {
 
     const [isOpen, setOpen] = useState(false)
 
@@ -321,6 +338,7 @@ const NotificatonList = ({ noteData }) => {
             const res = await get(`/method/tgc_custom.server_script.has_seen.update_seen?notification_id=${noteData?.name}`)
             console.log(res)
             toast.success(res?.message)
+            fetchNotification()
         }
         catch (err) {
             console.log(err)
@@ -335,22 +353,28 @@ const NotificatonList = ({ noteData }) => {
     const handleClose = () => setOpen(false);
 
     return (
-        <>
-            <div className='notifications' onClick={handleOpen}>
+        <div key={noteData?.name}>
+            {noteData?._seen ?
+                <div className='notifications' onClick={handleOpen}>
 
-                <div className='notify-dot'></div>
+                    <div className='notify-dot'></div>
 
-                <div className='text-container'>
-                    <h2 className='limit-1'>{noteData?.subject}</h2>
-                    <p className='limit-2'>{noteData?.email_content}</p>
+                    <div className='text-container'>
+                        <h2 className='limit-1'>{noteData?.subject}</h2>
+                        <p className='limit-2'>{noteData?.email_content}</p>
+                    </div>
                 </div>
-                {/* <div className='d-flex'>
-        <CustomChip document_type={'normal'} />
-        <button className=" bell-icon"><i className="bi bi-bell"></i></button>
+                :
+                <div className=' notifications nt-seen' onClick={handleOpen}>
+                    <div className='notify-dot'></div>
 
-    </div> */}
+                    <div className='text-container'>
+                        <h2 className='limit-1'>{noteData?.subject}</h2>
+                        <p className='limit-2'>{noteData?.email_content}</p>
+                    </div>
+                </div>
+            }
 
-            </div>
 
             <Dialog onClose={handleClose} open={isOpen} sx={{ p: 4 }}>
                 <DialogTitle sx={{ color: '#7f56d9', fontSize: '18px' }}>{noteData?.subject}</DialogTitle>
@@ -365,7 +389,7 @@ const NotificatonList = ({ noteData }) => {
                     </Button>
                 </DialogActions>
             </Dialog >
-        </>
+        </div>
     )
 }
 

@@ -5,11 +5,13 @@
 /* .notification-outer {
 
 } */
-
+.bell-icon {
+  position: relative;
+}
 .notify-count {
   position: absolute;
   font-size: 12px;
-  right: 20px;
+  right: 2px;
   top: 0px;
 }
 
@@ -68,6 +70,18 @@
 
     a:hover {
       text-decoration: underline;
+    }
+  }
+
+  .nt-seen {
+    .notify-dot {
+      background-color: white;
+    }
+    h2 {
+      color: #7f56d994;
+    }
+    p {
+      color: #918e8e;
     }
   }
 }
