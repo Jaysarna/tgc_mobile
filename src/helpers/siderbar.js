@@ -336,7 +336,7 @@ const NotificatonList = ({ noteData, fetchNotification }) => {
 
         try {
             const res = await get(`/method/tgc_custom.server_script.has_seen.update_seen?notification_id=${noteData?.name}`)
-            console.log(res)
+            // console.log(res)
             toast.success(res?.message)
             fetchNotification()
         }
@@ -354,7 +354,7 @@ const NotificatonList = ({ noteData, fetchNotification }) => {
 
     return (
         <div key={noteData?.name}>
-            {noteData?._seen ?
+            {!noteData?._seen ?
                 <div className='notifications' onClick={handleOpen}>
 
                     <div className='notify-dot'></div>
