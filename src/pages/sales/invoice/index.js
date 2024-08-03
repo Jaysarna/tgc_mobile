@@ -93,7 +93,9 @@ const DataTable = ({ tableData }) => {
                     const name = tableMeta.rowData[2]
 
                     return (
-                        <div className='table-row__info' style={{ cursor: 'pointer' }}>
+                        <div className='table-row__info' style={{ cursor: 'pointer' }} onClick={() => {
+                            router.push(`/sales/invoice/view/${value}`)
+                        }}>
                             <p className='table-row__name'>{name}</p>
                             <span className='table-row__small ms-1'>{value}</span>
                         </div >
@@ -198,6 +200,7 @@ const DataTable = ({ tableData }) => {
     const options = {
         filterType: 'dropdown',
         responsive: 'standard',
+        selectableRows: 'none',
         textLabels: {
             body: {
                 noMatch: 'No Records Found'

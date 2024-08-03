@@ -7,14 +7,14 @@ import moment from 'moment';
 import { get } from '@/configs/apiUtils';
 import { AddIcon, EditIcon } from '@/icons/actions';
 import { handleError } from '@/Api/showError';
+import Link from 'next/link';
 
 const DataTable = () => {
     const router = useRouter();
     const [tableData, setTableData] = useState([]);
     const [sampleData, setSampleData] = useState([]);
     const [sample, setSample] = useState(0);
-    const [rowId, setRowId] = useState(false)
-    const [customerData, setCustomerData] = useState('')
+
 
     async function fetchCsList() {
         try {
@@ -61,20 +61,6 @@ const DataTable = () => {
     }, []);
 
 
-    async function fetchTransactionList() {
-        try {
-            const customerId = data[rowId][1];
-            const res = await get(`https://tgc67.online/api/resource/GL%20Entry?filters=[["account", "=", "Debtors - TGC"],["party_type","=","Customer"],["party", "=", "${customerId}"]]&fields=["posting_date","account","debit_in_account_currency","credit_in_account_currency","against","voucher_no"]&limit=20&order_by=posting_date&limit_start=0`);
-            // console.log(res);
-            setCustomerData(res?.data)
-        } catch (err) {
-            console.error(err);
-        }
-    }
-
-    useEffect(() => {
-        fetchTransactionList()
-    }, [rowId])
 
 
     const columns = !sample
@@ -85,9 +71,8 @@ const DataTable = () => {
                 label: 'Customer Name',
                 options: {
                     customBodyRender: (value, tableMeta) => (
-                        <div>
-                            {value}
-                        </div>
+                        <Link href={`/customer/${value}/list`}> {value}</Link>
+
                     )
                 }
             },
@@ -109,7 +94,7 @@ const DataTable = () => {
                     customBodyRender: (value, tableMeta) => (
                         <AddIcon
                             className="plus-icon-btn"
-                            onClick={() => router.push(`/customer/${tableMeta.rowData[0]}/recive-payment`)}
+                            onClick={() => router.push(`/customer/${tableMeta.rowData[1]}/recive-payment`)}
                         />
                     )
                 }
@@ -119,7 +104,7 @@ const DataTable = () => {
                 options: {
                     customBodyRender: (value, tableMeta) => (
                         <EditIcon
-                            onClick={() => router.push(`/customer/${tableMeta.rowData[0]}/edit`)}
+                            onClick={() => router.push(`/customer/${tableMeta.rowData[1]}/edit`)}
                         />
                     )
                 }
@@ -144,30 +129,14 @@ const DataTable = () => {
     const options = {
         filterType: 'dropdown',
         responsive: 'standard',
+        selectableRows: 'none',
         textLabels: {
             body: {
                 noMatch: 'No Records Found',
             },
         },
         print: false,
-        expandableRows: true,
-        expandableRowsOnClick: true,
-        renderExpandableRow: (rowData, rowMeta) => {
-            const colSpan = rowData.length + 1;
-            setRowId(rowMeta?.rowIndex)
 
-            return (
-                <tr>
-                    <td colSpan={colSpan}>
-                        <div style={{ padding: '25px' }}>
-                            <GLTable customerData={customerData} />
-                        </div>
-                    </td>
-                </tr>
-            );
-
-
-        }
     };
 
     return (
@@ -219,52 +188,3 @@ export default DataTable;
 
 
 
-const GLTable = ({ customerData }) => {
-
-
-    const glColumns = [
-        {
-            name: 'posting_date', label: 'Posting Date', options: {
-                customBodyRender: (value, tableMeta) => (
-
-                    <>
-                        {moment(value).format('DD-MM-yyyy')}
-                    </>
-                )
-            }
-        },
-        // { name: 'account', label: 'Account' },
-        { name: 'debit_in_account_currency', label: 'Debit' },
-        { name: 'credit_in_account_currency', label: 'Credit' },
-        { name: 'against', label: 'Against' },
-        { name: 'voucher_no', label: 'Voucher No.' },
-    ];
-
-
-
-    return (
-        <MUIDataTable
-            title=""
-            data={customerData || []}
-            columns={glColumns}
-            options={{
-                filterType: 'dropdown',
-                search: false,
-                download: false,
-                filter: false,
-                responsive: 'standard',
-                selectableRows: 'none',
-                viewColumns: false,
-                pagination: false,
-                elevation: 0,
-
-                textLabels: {
-                    body: {
-                        noMatch: 'No GL Entries Found',
-                    },
-                },
-                print: false
-            }}
-        />
-    );
-};

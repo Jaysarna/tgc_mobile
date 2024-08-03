@@ -27,14 +27,7 @@ const columns = [
             }
         }
     },
-    // {
-    //     name: "account",
-    //     label: "Account",
-    //     options: {
-    //         filter: true,
-    //         sort: false,
-    //     },
-    // },
+
     {
         name: "voucher_no",
         label: "Voucher No",
@@ -144,16 +137,6 @@ const Index = () => {
                 const totalDebit = transcation.reduce((total, item) => total + item.debit_in_account_currency, 0);
                 const totalCredit = transcation.reduce((total, item) => total + item.credit_in_account_currency, 0);
 
-                // Add a total row to the transcation array
-                // console.log(totalDebit)
-                // const totalRow = {
-                //     posting_date: "Total",
-                //     voucher_no: "",
-                //     debit_in_account_currency: totalDebit,
-                //     credit_in_account_currency: totalCredit,
-                //     against: "",
-                // };
-
                 setTranscation((prevTranscation) => [...prevTranscation]);
 
                 setLoading(false);
@@ -191,7 +174,7 @@ const Index = () => {
                                         <ArrowBackIcon className='' />
                                     </div>
                                     <div className='col-md-8'>
-                                        Accounting Transactions{' '}
+                                        Expenses{' '}
                                         <span className='span-user-clr'>{transcation.length}</span>
                                     </div>
 

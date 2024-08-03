@@ -1,7 +1,6 @@
 import '@/styles/globals.css';
 import '@/styles/login.css';
 import '@/styles/main.css';
-
 import '@/styles/newitem.css';
 import '@/styles/datatable.css';
 import '@/styles/loader.css';

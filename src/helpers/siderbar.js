@@ -89,11 +89,8 @@ const Siderbar = ({ children }) => {
                                 <li className="sd-link" onClick={() => handleRoutePage('/sales/invoice')}>All Sales Invoices</li>
 
                                 <li className="sd-link" onClick={() => handleRoutePage('/transcation/list')}>Transcation List</li>
-                                {/* <li className="sd-link" onClick={() => handleRoutePage('/samples/supplier')}>Samples List</li> */}
+                                <li className="sd-link" onClick={() => handleRoutePage('/expenses/list')}>Expenses List</li>
 
-                                {/* <li className="sd-link" onClick={() => handleRoutePage('/customer')}>Customer List</li> */}
-                                {/* <li className="sd-link" onClick={() => handleRoutePage('/item')}>All Purchase Invoices</li>
-                                <li className="sd-link" onClick={() => handleRoutePage('/supplier')}>All Sales Invoices</li> */}
                                 <DropLi
                                     nav='Other Features '
                                     navItems={[
@@ -198,15 +195,13 @@ const ContextMenu = () => {
                     <section>
                         <li onClick={() => handleRoutePage('/customer/new-customer')}>Create a New Customer</li>
 
-                        {/* // <li onClick={() => handleRoutePage('/item/newitem')}>Create New Item</li>*/}
-                        {/* <li>Create a New Customer</li>   */}
                         <li onClick={() => handleRoutePage('/supplier/newsupplier')}>Create a New Supplier</li>
                         <li onClick={() => handleRoutePage('/purchase/invoice/new-invoice')}>Create Purchase Invoice</li>
                         <li onClick={() => handleRoutePage('/sales/invoice/new-invoice')}>Create Sales Invoice</li>
-                        {/* // <li onClick={() => handleRoutePage('/main')}>Main Dashboard</li> */}
-                        {/* <li onClick={() => handleRoutePage('/main')}>Sales Dashboard</li> */}
+
                         <li onClick={() => handleRoutePage('/payment/make-a-payment')}>Make a Payment</li>
                         <li onClick={() => handleRoutePage('/payment/recieve-a-payment')}>Receive a Payment</li>
+                        <li onClick={() => handleRoutePage('/expenses/newexpenses')}>Add Expenses</li>
                         {/* <li onClick={() => handleRoutePage('/journal-entry')}>Journal Entry</li> */}
                     </section>
 
@@ -278,7 +273,7 @@ const Notification = () => {
 
                 <div className="bell-outer" onClick={() => handleOpen()}>
                     <div className="col-md-2">
-                        <button className="btn btn-primary bell-icon"><spna className='notify-count'>{totalCount}</spna><i className="bi bi-bell"></i></button>
+                        <button className="btn btn-primary bell-icon"><span className='notify-count'>{totalCount}</span><i className="bi bi-bell"></i></button>
                     </div>
 
                 </div>
@@ -336,7 +331,7 @@ const NotificatonList = ({ noteData, fetchNotification }) => {
 
         try {
             const res = await get(`/method/tgc_custom.server_script.has_seen.update_seen?notification_id=${noteData?.name}`)
-            // console.log(res)
+            // console.log(res)npm 
             toast.success(res?.message)
             fetchNotification()
         }
