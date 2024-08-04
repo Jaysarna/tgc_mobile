@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from "react";
-import MUIDataTable from "mui-datatables";
-import { getAuthHeader } from "@/helpers/Header";
-import withAuth from "@/customhook/withAuth";
-import Siderbar from "@/helpers/siderbar";
-import { LoadingPage } from "@/helpers/Loader";
+import React, { useState, useEffect, useCallback } from 'react';
+import MUIDataTable from 'mui-datatables';
+import TablePagination from '@mui/material/TablePagination';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useRouter } from "next/router";
-import { get } from "@/configs/apiUtils";
-import moment from "moment";
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { IconButton } from '@mui/material';
+import { useRouter } from 'next/router';
+import moment from 'moment';
+import Siderbar from '@/helpers/siderbar';
+import { LoadingPage } from '@/helpers/Loader';
+import withAuth from '@/customhook/withAuth';
+import TableSearchBar from '@/customhook/customSearch';
+import { get } from '@/configs/apiUtils';
 
 const columns = [
     {
@@ -16,25 +19,9 @@ const columns = [
         options: {
             filter: true,
             sort: true,
-        },
-        options: {
-            customBodyRender: (value) => {
-                return (
-                    <>
-                        {moment(value).format('l')}
-                    </>
-                )
-            }
+            customBodyRender: (value) => moment(value).format('l'),
         }
     },
-    // {
-    //     name: "account",
-    //     label: "Account",
-    //     options: {
-    //         filter: true,
-    //         sort: false,
-    //     },
-    // },
     {
         name: "voucher_no",
         label: "Voucher No",
@@ -67,150 +54,182 @@ const columns = [
             sort: true,
         },
     },
-    // {
-    //     name: "against",
-    //     label: "Party Name",
-
-    // },
-
 ];
 
 const Index = () => {
+    const router = useRouter();
 
-    const router = useRouter()
+    const [data, setData] = useState({
+        transcation: [],
+        filteredTranscation: [],
+        loading: true,
+        page: 0,
+        rowsPerPage: 10,
+        totalCount: 0,
+        totalAmount: { debit: 0, credit: 0 }
+    });
 
-    const [transcation, setTranscation] = useState([])
+    const { transcation, filteredTranscation, loading, page, rowsPerPage, totalCount, totalAmount } = data;
+    const { debit, credit } = totalAmount;
 
-    const options = {
-        filterType: "dropdown",
-        responsive: "standard",
-        // customFooter: (currentPage, pageRows, totalPages, changeRowsPerPage, changePage, textLabels) => {
-        //     const totalDebit = transcation.reduce((total, item) => total + item.debit_in_account_currency, 0);
-        //     const totalCredit = transcation.reduce((total, item) => total + item.credit_in_account_currency, 0);
+    const fetchData = useCallback(async (page, rowsPerPage) => {
+        try {
+            const baseURL = "https://tgc67.online/api/resource/GL%20Entry";
+            const filters = encodeURIComponent(JSON.stringify([["account", "=", "Cash - TGC"]]));
+            const fields = encodeURIComponent(JSON.stringify(["posting_date", "account", "remarks", "debit_in_account_currency", "credit_in_account_currency", "against", "voucher_no"]));
+            const limit = rowsPerPage;
+            const offset = page * rowsPerPage;
+            const orderBy = "posting_date";
 
-        //     return (
-        //         <div className="row p-4 ">
-        //             <div className="col-md-6 p-3">
-        //                 Total Debit:  {" "}<span className="span-user-clr">{totalDebit}</span> {" "}
-        //                 Total Credit {" "}
-        //                 <span className="span-user-clr">{totalCredit}</span>
+            const url = `${baseURL}?filters=${filters}&fields=${fields}&limit=${limit}&order_by=${orderBy}&limit_start=${offset}`;
 
-        //             </div>
-        //             {/* <div className="col-md-6">
-        //                 <TablePagination
-        //                     count={transcation.length - 1} // Exclude the total row for pagination
-        //                     page={currentPage}
-        //                     rowsPerPage={pageRows}
-        //                     totalPages={totalPages}
-        //                     changeRowsPerPage={changeRowsPerPage}
-        //                     changePage={changePage}
-        //                     textLabels={textLabels}
-        //                 />
-        //             </div> */}
+            const response = await get(url);
 
-        //         </div>
-        //     );
-        // },
-    };
-
-
-
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchData = async () => {
-
-            const authheader = getAuthHeader()
-
-            try {
-                const baseURL = "https://tgc67.online/api/resource/GL%20Entry";
-                const filters = encodeURIComponent(JSON.stringify([["account", "=", "Cash - TGC"]]));
-                const fields = encodeURIComponent(JSON.stringify(["posting_date", "account", "remarks", "debit_in_account_currency", "credit_in_account_currency", "against", "voucher_no"]));
-                const limit = "100000";
-                const orderBy = "posting_date";
-                const limitStart = "0";
-
-                const url = `${baseURL}?filters=${filters}&fields=${fields}&limit=${limit}&order_by=${orderBy}&limit_start=${limitStart}`;
-
-                const response = await get(url)
-
-                if (!response.data) {
-                    throw new Error("Failed to fetch data");
-                }
-
-                setTranscation(response?.data || []);
-
-                const totalDebit = transcation.reduce((total, item) => total + item.debit_in_account_currency, 0);
-                const totalCredit = transcation.reduce((total, item) => total + item.credit_in_account_currency, 0);
-
-                // Add a total row to the transcation array
-                // console.log(totalDebit)
-                // const totalRow = {
-                //     posting_date: "Total",
-                //     voucher_no: "",
-                //     debit_in_account_currency: totalDebit,
-                //     credit_in_account_currency: totalCredit,
-                //     against: "",
-                // };
-
-                setTranscation((prevTranscation) => [...prevTranscation]);
-
-                setLoading(false);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-                setLoading(false);
+            if (!response.data) {
+                throw new Error("Failed to fetch data");
             }
-        };
 
-        fetchData();
+            const data = response.data || [];
+            setData({
+                transcation: data,
+                filteredTranscation: data,
+                loading: false,
+                page,
+                rowsPerPage,
+                totalCount: response.totalCount || 0,
+                totalAmount: {
+                    debit: data.reduce((acc, item) => acc + item.debit_in_account_currency, 0),
+                    credit: data.reduce((acc, item) => acc + item.credit_in_account_currency, 0)
+                }
+            });
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            setData(prevState => ({
+                ...prevState,
+                loading: false
+            }));
+        }
     }, []);
 
+    useEffect(() => {
+        fetchData(page, rowsPerPage);
+    }, [fetchData, page, rowsPerPage]);
+
+    const handleSearch = useCallback((value) => {
+        const filteredData = transcation.filter(item =>
+            item.voucher_no.toLowerCase().includes(value?.toLowerCase()) ||
+            item.remarks.toLowerCase().includes(value?.toLowerCase())
+        );
+        setData(prevState => ({
+            ...prevState,
+            filteredTranscation: filteredData,
+            totalAmount: {
+                debit: filteredData.reduce((acc, item) => acc + item.debit_in_account_currency, 0),
+                credit: filteredData.reduce((acc, item) => acc + item.credit_in_account_currency, 0)
+            }
+        }));
+    }, [transcation]);
+
+    const handleReset = () => {
+        setData(prevState => ({
+            ...prevState,
+            filteredTranscation: prevState.transcation,
+            totalAmount: {
+                debit: prevState.transcation.reduce((acc, item) => acc + item.debit_in_account_currency, 0),
+                credit: prevState.transcation.reduce((acc, item) => acc + item.credit_in_account_currency, 0)
+            }
+        }));
+    };
+
+    const options = React.useMemo(() => ({
+        filterType: "dropdown",
+        responsive: "standard",
+        pagination: false,
+        search: true,
+        reset: true,
+        onSearchChange: handleSearch,
+        customFooter: () => (
+            <div className="container row p-3">
+                <h6 className='row__title p-3 d-flex align-items-center'>
+                    <div className='col-4'>
+                        Total Debit{' '}
+                        <span className='span-user-clr'>
+                            {'$ '}{debit}
+                        </span>
+                    </div>
+                    <div className='col-4'>
+                        Total Credit{' '}
+                        <span className='span-user-clr'>
+                            {'$ '}{credit}
+                        </span>
+                    </div>
+                </h6>
+                <div className='col-12'>
+                    <TablePagination
+                        component="div"
+                        count={totalCount}
+                        page={page}
+                        onPageChange={(event, newPage) => setData(prevState => ({ ...prevState, page: newPage }))}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={(event) => setData(prevState => ({ ...prevState, rowsPerPage: parseInt(event.target.value, 10), page: 0 }))}
+                    />
+                </div>
+            </div>
+        ),
+        customSearchRender: (searchText, handleSearch, hideSearch, options) => (
+            <TableSearchBar
+                searchText={searchText}
+                onSearch={handleSearch}
+                onHide={hideSearch}
+                options={options}
+                handleReset={handleReset}
+            />
+        ),
+    }), [handleSearch, transcation, debit, credit, page, rowsPerPage]);
+
+    const tableTitle = (
+        <div className="container row p-3">
+            <h6 className='row__title d-flex align-items-center'>
+                <div
+                    className='p-2'
+                    onClick={() => router.push('/main')}
+                    style={{ cursor: 'pointer' }}
+                >
+                    <ArrowBackIcon className='' />
+                </div>
+                <div className='col-md-6'>
+                    Accounting Transactions{' '}
+                    <span className='span-user-clr'>{filteredTranscation.length}</span>
+                </div>
+                <div className='col-4'>
+                    Cash{' '}
+                    <span className='span-user-clr'>
+                        {'$ '}
+                        {debit - credit}
+                    </span>
+                </div>
+                <div className='col-1 d-flex justify-content-end'>
+                    <IconButton onClick={handleReset}>
+                        <RefreshIcon />
+                    </IconButton>
+                </div>
+            </h6>
+        </div>
+    );
 
     return (
         <>
             <Siderbar />
             <div className='table-vw-size mbvw-tbl-scrl'>
-
-
                 {loading ? (
                     <LoadingPage msg='Loading' />
                 ) : (
-
                     <MUIDataTable
-                        title={
-                            <div className="container row p-3">
-                                <h6 className='row__title p-3 d-flex align-items-center'>
-                                    <div
-                                        className='p-2'
-                                        onClick={() => {
-                                            router.push('/main')
-                                        }}
-                                        style={{ cursor: 'pointer' }}
-                                    >
-                                        <ArrowBackIcon className='' />
-                                    </div>
-                                    <div className='col-md-8'>
-                                        Accounting Transactions{' '}
-                                        <span className='span-user-clr'>{transcation.length}</span>
-                                    </div>
-
-                                    <div className='col-6'>
-                                        Cash{' '}
-                                        <span className='span-user-clr'>
-                                            {'$ '}
-                                            {(transcation.reduce((total, item) => total + item.debit_in_account_currency, 0) - transcation.reduce((total, item) => total + item.credit_in_account_currency, 0))}
-                                        </span>
-                                    </div>
-                                </h6>
-                            </div>
-                        }
-
-                        data={transcation}
+                        title={tableTitle}
+                        data={filteredTranscation}
                         columns={columns}
                         options={options}
                     />
-
                 )}
             </div>
         </>
