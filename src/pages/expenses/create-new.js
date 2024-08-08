@@ -8,6 +8,7 @@ import withAuth from '@/customhook/withAuth';
 import { handleError } from '@/Api/showError';
 import { post } from '@/configs/apiUtils';
 import toast from 'react-hot-toast';
+import { LoadingPage } from '@/helpers/Loader';
 
 
 
@@ -41,19 +42,15 @@ const AddRemoveForm = () => {
         },]
     }
 
-    const [journalEntry, setJournalEntry] = useState(intialData);
-
-
-    const getTotal = (property) => {
-        return journalEntry.items.reduce((total, item) => total + item[property], 0);
-    };
+    const [setExpenses, setJournalEntry] = useState(intialData);
+    const [isLoading, setLoading] = useState(false)
 
 
 
 
     const handleAmount = (e) => {
         setJournalEntry({
-            ...journalEntry,
+            ...setExpenses,
             amount: e.target.value,
         });
     }
@@ -63,7 +60,7 @@ const AddRemoveForm = () => {
 
     const handleAddMoney = async (e) => {
         e.preventDefault();
-
+        setLoading(true)
         const apiUrl = 'https://tgc67.online/api/resource/Journal%20Entry';
 
         // const add = [
@@ -82,13 +79,13 @@ const AddRemoveForm = () => {
         const remove = [
             {
                 "account": 'Cash - TGC',
-                "credit_in_account_currency": journalEntry.amount,
+                "credit_in_account_currency": setExpenses.amount,
                 "debit_in_account_currency": 0,
             },
             {
                 "account": 'Capital Stock - TGC',
                 "credit_in_account_currency": 0,
-                "debit_in_account_currency": journalEntry.amount,
+                "debit_in_account_currency": setExpenses.amount,
             }
         ];
 
@@ -98,12 +95,12 @@ const AddRemoveForm = () => {
 
             data: {
                 "entry_type": 'Journal Entry',
-                "cheque_no": journalEntry.referenceNumber,
+                "cheque_no": setExpenses.referenceNumber,
                 // "cheque_date": journalEntry.referenceDate,
                 "docstatus": "1",
 
-                "posting_date": journalEntry.postingDate,
-                "cheque_date": journalEntry.postingDate,
+                "posting_date": setExpenses.postingDate,
+                "cheque_date": setExpenses.postingDate,
                 "accounts": remove,
 
             },
@@ -112,7 +109,6 @@ const AddRemoveForm = () => {
         try {
             const response = await post(apiUrl, requestData)
 
-            console.log(response)
             if (response?.data) {
 
                 toast.success("Expense Added Successfully")
@@ -122,23 +118,17 @@ const AddRemoveForm = () => {
 
             // console.log('API Response:', response.statusText)
         } catch (error) {
-
-
-            if (error.response?.status === 403) {
-
-                sessionStorage.clear()
-            }
-            else {
-                handleError(error)
-            }
+            console.log(error)
         }
+
+        setLoading(false)
     }
 
 
 
     const handleReference = (e) => {
         setJournalEntry({
-            ...journalEntry,
+            ...setExpenses,
             referenceNumber: e.target.value
         })
     }
@@ -146,7 +136,7 @@ const AddRemoveForm = () => {
 
     const handlePostingDateChange = (e) => {
         setJournalEntry({
-            ...journalEntry,
+            ...setExpenses,
             postingDate: e.target.value,
         });
     };
@@ -156,6 +146,10 @@ const AddRemoveForm = () => {
 
     return (
         <>
+            {isLoading &&
+                <LoadingPage
+                    msg='Adding...'
+                />}
             <Siderbar />
             <div>
                 <div className="col-lg-12 itemOuter mt-3">
@@ -185,7 +179,7 @@ const AddRemoveForm = () => {
                                                 name="postingDate"
                                                 className="form-control"
                                                 id="postingDate"
-                                                value={journalEntry.postingDate}
+                                                value={setExpenses.postingDate}
                                                 onChange={handlePostingDateChange}
                                             />
                                         </div>
@@ -197,7 +191,7 @@ const AddRemoveForm = () => {
                                                 name="amount"
                                                 className="form-control"
                                                 id="amount"
-                                                value={journalEntry.amount}
+                                                value={setExpenses.amount}
                                                 onChange={handleAmount}
                                             />
                                         </div>
@@ -209,7 +203,7 @@ const AddRemoveForm = () => {
                                                 name="referenceNumber"
                                                 className="form-control"
                                                 id="referenceNumber"
-                                                value={journalEntry.referenceNumber}
+                                                value={setExpenses.referenceNumber}
                                                 onChange={handleReference}
                                             />
                                         </div>

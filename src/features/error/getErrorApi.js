@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 
 
 export async function handleShowApiError(err) {
-    console.log(err)
+    // console.log(err)
     if (err?.response?.status != 401) {
         showApiError(err?.response?.data)
     }

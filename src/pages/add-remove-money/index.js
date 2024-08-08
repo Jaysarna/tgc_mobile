@@ -64,13 +64,10 @@ const AddRemoveForm = () => {
             debit: 0,
             credit: 0
         };
-        // Create a copy of the current items array
         const updatedItems = [...journalEntry.items];
 
-        // Add the new item to the copy
         updatedItems.push(newItem);
 
-        // Update the journalEntry state with the modified items array
         setJournalEntry({
             ...journalEntry,
             items: updatedItems,
@@ -79,11 +76,9 @@ const AddRemoveForm = () => {
     };
 
     const removeList = (accountToFilter) => {
-        // console.log(accountToFilter)
 
         const filteredItems = journalEntry.items.filter(item => item.uid !== accountToFilter);
 
-        // Update the journalEntry state with the filtered array
         setJournalEntry({
             ...journalEntry,
             items: filteredItems,
@@ -135,7 +130,6 @@ const AddRemoveForm = () => {
 
     const handleAddMoney = async (e) => {
         e.preventDefault();
-        const authHeader = getAuthHeader()
 
         const apiUrl = 'https://tgc67.online/api/resource/Journal%20Entry';
 
@@ -185,7 +179,6 @@ const AddRemoveForm = () => {
         try {
             const response = await post(apiUrl, requestData)
 
-            console.log(response)
             if (response?.data) {
                 if (journalEntry.type === 'Add') {
                     toast.success("Money Added Successfully")
