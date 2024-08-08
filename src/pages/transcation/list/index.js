@@ -11,6 +11,9 @@ import { LoadingPage } from '@/helpers/Loader';
 import withAuth from '@/customhook/withAuth';
 import TableSearchBar from '@/customhook/customSearch';
 import { get } from '@/configs/apiUtils';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
+
 
 const columns = [
     {
@@ -66,11 +69,15 @@ const Index = () => {
         page: 0,
         rowsPerPage: 10,
         totalCount: 0,
-        totalAmount: { debit: 0, credit: 0 }
+        totalAmount: { debit: 0, credit: 0 },
+        startDate: new Date(),
+        endDate: new Date(),
+        dateRange: [new Date(), new Date()],
     });
 
-    const { transcation, filteredTranscation, loading, page, rowsPerPage, totalCount, totalAmount } = data;
+    const { transcation, filteredTranscation, loading, page, rowsPerPage, totalCount, totalAmount, dateRange } = data;
     const { debit, credit } = totalAmount;
+
 
     const fetchData = useCallback(async (page, rowsPerPage) => {
         try {
@@ -187,6 +194,9 @@ const Index = () => {
         ),
     }), [handleSearch, transcation, debit, credit, page, rowsPerPage]);
 
+    console.log(dateRange)
+
+
     const tableTitle = (
         <div className="container row p-3">
             <h6 className='row__title d-flex align-items-center'>
@@ -214,6 +224,28 @@ const Index = () => {
                     </IconButton>
                 </div>
             </h6>
+
+
+            <div className="col-md-12 d-flex align-items-center mt-4 ">
+                <span className="mr-1"></span>
+                <DatePicker
+                    selectsRange={true}
+                    startDate={dateRange ? dateRange[0] : new Date()}
+                    endDate={dateRange ? dateRange[1] : new Date()}
+                    onChange={(update) => {
+                        // console.log(dateRange)
+                        setData({
+                            ...data,
+                            dateRange: update
+                        })
+
+                    }}
+                    isClearable={true}
+                    withPortal
+                    className='datepicker'
+                />
+                <button className='btn btn-sm btn-primary ml-2' >Filter</button>
+            </div>
         </div>
     );
 

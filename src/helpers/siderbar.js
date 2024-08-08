@@ -201,7 +201,7 @@ const ContextMenu = () => {
 
                         <li onClick={() => handleRoutePage('/payment/make-a-payment')}>Make a Payment</li>
                         <li onClick={() => handleRoutePage('/payment/recieve-a-payment')}>Receive a Payment</li>
-                        <li onClick={() => handleRoutePage('/expenses/newexpenses')}>Add Expenses</li>
+                        <li onClick={() => handleRoutePage('/expenses/create-new')}>Add Expenses</li>
                         {/* <li onClick={() => handleRoutePage('/journal-entry')}>Journal Entry</li> */}
                     </section>
 
@@ -278,7 +278,6 @@ const Notification = () => {
 
                 </div>
 
-                {/* <Button onClick={() => handleOpen()}>open</Button> */}
                 <Drawer
                     anchor={'right'}
                     open={isOpenNotify}
@@ -307,17 +306,6 @@ const Notification = () => {
 
     )
 }
-
-
-
-// const CustomChip = ({ document_type }) => {
-//     return (
-//         <div className='custom-chip'>
-
-//             <Chip label="success" color="success" />
-//         </div>
-//     )
-// }
 
 
 
