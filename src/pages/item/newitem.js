@@ -1,12 +1,13 @@
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Siderbar from '../../helpers/siderbar';
 import axios from 'axios';
 import withAuth from '@/customhook/withAuth';
 import { authHeader, getAuthHeader } from '@/helpers/Header';
-import { handleError } from '@/Api/showError';
-import { Autocomplete, TextField, } from '@mui/material';
+import { Autocomplete, TextField } from '@mui/material';
 import { LoadingPage } from '@/helpers/Loader';
+import { post } from '@/configs/apiUtils';
+import toast from 'react-hot-toast';
 
 
 const NewItem = () => {
@@ -14,10 +15,10 @@ const NewItem = () => {
         itemName: '',
         itemGroup: 'Products',
         unitOfMeasure: 'Unit',
-        valuationRate: '',
+        valuationRate: 0,
         standardSellingRate: '',
         maintainStock: true,
-        quantity: 1,
+        quantity: 0,
         docStatus: 1,
         supplier: ''
     });
@@ -41,6 +42,13 @@ const NewItem = () => {
 
         const apiUrl = 'https://tgc67.online/api/resource/Item';
 
+        // if (formData.quantity > 0) {
+        //     if (formData.valuationRate < 0) {
+        //         toast.error('Please Enter the Correct Valuation Rate')
+        //         return
+        //     }
+        // }
+
         const requestData = {
             data: {
                 item_name: formData.itemName,
@@ -49,7 +57,7 @@ const NewItem = () => {
                 is_stock_item: formData.maintainStock ? '1' : '0',
                 // valuation_rate: formData.valuationRate,
                 // standard_rate: formData.standardSellingRate,
-                open_stock: formData.quantity,
+                opening_stock: formData.quantity,
                 // docstatus: '1',
                 supplier_items: [{
                     supplier: formData.supplier,
@@ -58,22 +66,28 @@ const NewItem = () => {
         };
 
         try {
-            const response = await axios.post(apiUrl, requestData, authHeader);
+            const response = await post(apiUrl, requestData, authHeader);
+            // console.log(response);
 
-            if (response.statusText === 'OK') {
-                alert('Item Added Successfully');
-                route.push('/main');
+            if (response?.data) {
+                toast.success('Item Added Successfully');
+                setFormData({
+                    itemName: '',
+                    itemGroup: 'Products',
+                    unitOfMeasure: 'Unit',
+                    valuationRate: 0,
+                    standardSellingRate: '',
+                    maintainStock: true,
+                    quantity: 1,
+                    docStatus: 1,
+                    supplier: ''
+                })
+                // route.push('/main');
             }
         } catch (error) {
 
-            console.error('API Error:', error);
-            if (error.response?.status === 403) {
-                alert("Login Expired")
-                route.push('/')
-            }
-            else {
-                handleError(error)
-            }
+            console.log(error);
+
         }
         setLoading(false)
     };
@@ -109,7 +123,7 @@ const NewItem = () => {
             <Siderbar />
             {isLoading &&
                 <LoadingPage
-                    msg='Creating New Item '
+                    msg='Creating Item'
                 />}
             <div>
                 <div className="col-lg-6 itemOuter mt-3">
@@ -132,6 +146,20 @@ const NewItem = () => {
                                         </div>
                                     </div>
                                     <form onSubmit={handleAddItem} method="post" className="row g-3 needs-validation">
+
+                                        <div className='col-12 mb-2'>
+                                            <label htmlFor="itemName" className="form-label">
+                                                Supplier
+                                            </label>
+                                            <Autocomplete
+                                                value={formData.supplier}
+                                                onChange={(event, newValue) => handleSupplier(newValue)}
+                                                options={cusList.map((option) => option.name)}
+                                                renderInput={(params) => <TextField {...params} id="outlined-size-small" size='small' />}
+
+                                            />
+                                        </div>
+
                                         <div className="col-12">
                                             <label htmlFor="itemName" className="form-label">
                                                 Item name
@@ -149,95 +177,7 @@ const NewItem = () => {
                                                 <div className="invalid-feedback">Please enter your item Name.</div>
                                             </div>
                                         </div>
-                                        <div className='col-12 mb-4'>
-                                            <label htmlFor="itemName" className="form-label">
-                                                Supplier
-                                            </label>
-                                            <Autocomplete
-                                                value={formData.supplier}
-                                                onChange={(event, newValue) => handleSupplier(newValue)}
-                                                options={cusList.map((option) => option.name)}
-                                                renderInput={(params) => <TextField {...params} id="outlined-size-small" size='small' />}
-
-                                            />
-                                        </div>
-                                        <div className="col-12 mb-4">
-                                            <label htmlFor="itemGroup" className="form-label">
-                                                Item Group
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="itemGroup"
-                                                className="form-control"
-                                                id="itemGroup"
-                                                required
-                                                value={formData.itemGroup}
-                                                onChange={handleChange}
-                                            />
-                                            <div className="invalid-feedback">Please enter the item group.</div>
-                                        </div>
-                                        {/* <div className="col-12 mb-4">
-                                            <div className="form-check">
-                                                <input
-                                                    type="checkbox"
-                                                    name="docStatusCheckbox"
-                                                    className="form-check-input"
-                                                    id="docStatusCheckbox"
-                                                    checked={formData.docStatus === 0}
-                                                    onChange={handleDocStatusCheckboxChange}
-                                                />
-                                                <strong className="form-check-strong" htmlFor="docStatusCheckbox">
-                                                    Sample
-                                                </strong>
-                                            </div>
-                                        </div> */}
-
-                                        <div className="col-12 mb-4">
-                                            <label htmlFor="unitOfMeasure" className="form-label">
-                                                Default Unit of Measure
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="unitOfMeasure"
-                                                className="form-control"
-                                                id="unitOfMeasure"
-                                                required
-                                                value={formData.unitOfMeasure}
-                                                onChange={handleChange}
-                                            />
-                                            <div className="invalid-feedback">Please enter the unit of measure.</div>
-                                        </div>
-                                        {/* <div className="col-12 mb-4">
-                                            <label htmlFor="valuationRate" className="form-label">
-                                                Valuation Rate
-                                            </label>
-                                            <input
-                                                type="number"
-                                                name="valuationRate"
-                                                className="form-control"
-                                                id="valuationRate"
-                                                required
-                                                value={formData.valuationRate}
-                                                onChange={handleChange}
-                                            />
-                                            <div className="invalid-feedback">Please enter the valuation rate.</div>
-                                        </div>
-                                        <div className="col-12 mb-4">
-                                            <label htmlFor="standardSellingRate" className="form-label">
-                                                Standard Selling Rate
-                                            </label>
-                                            <input
-                                                type="number"
-                                                name="standardSellingRate"
-                                                className="form-control"
-                                                id="standardSellingRate"
-                                                required
-                                                value={formData.standardSellingRate}
-                                                onChange={handleChange}
-                                            />
-                                            <div className="invalid-feedback">Please enter the standard selling rate.</div>
-                                        </div> */}
-                                        <div className="col-12 mb-4">
+                                        <div className="col-12 mb-2">
                                             <label htmlFor="standardSellingRate" className="form-label">
                                                 Quantity
                                             </label>
@@ -252,6 +192,88 @@ const NewItem = () => {
                                             />
                                             <div className="invalid-feedback">Please enter the Quantity.</div>
                                         </div>
+
+
+                                        <div className="col-12 mb-2">
+                                            <label htmlFor="valuationRate" className="form-label">
+                                                Valuation Rate
+                                            </label>
+                                            <input
+                                                type="number"
+                                                name="valuationRate"
+                                                className="form-control"
+                                                id="valuationRate"
+                                                required
+                                                value={formData.valuationRate}
+                                                onChange={handleChange}
+                                            />
+                                            <div className="invalid-feedback">Please enter the valuation rate.</div>
+                                        </div>
+
+
+                                        <div className="col-12 mb-2">
+                                            <label htmlFor="itemGroup" className="form-label">
+                                                Item Group
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="itemGroup"
+                                                className="form-control"
+                                                id="itemGroup"
+                                                required
+                                                value={formData.itemGroup}
+                                                onChange={handleChange}
+                                            />
+                                            <div className="invalid-feedback">Please enter the item group.</div>
+                                        </div>
+                                        {/* <div className="col-12 mb-2">
+                                            <div className="form-check">
+                                                <input
+                                                    type="checkbox"
+                                                    name="docStatusCheckbox"
+                                                    className="form-check-input"
+                                                    id="docStatusCheckbox"
+                                                    checked={formData.docStatus === 0}
+                                                    onChange={handleDocStatusCheckboxChange}
+                                                />
+                                                <strong className="form-check-strong" htmlFor="docStatusCheckbox">
+                                                    Sample
+                                                </strong>
+                                            </div>
+                                        </div> */}
+                                        {/* 
+                                        <div className="col-12 mb-2">
+                                            <label htmlFor="unitOfMeasure" className="form-label">
+                                                Default Unit of Measure
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="unitOfMeasure"
+                                                className="form-control"
+                                                id="unitOfMeasure"
+                                                required
+                                                value={formData.unitOfMeasure}
+                                                onChange={handleChange}
+                                            />
+                                            <div className="invalid-feedback">Please enter the unit of measure.</div>
+                                        </div> */}
+
+                                        {/*  <div className="col-12 mb-2">
+                                            <label htmlFor="standardSellingRate" className="form-label">
+                                                Standard Selling Rate
+                                            </label>
+                                            <input
+                                                type="number"
+                                                name="standardSellingRate"
+                                                className="form-control"
+                                                id="standardSellingRate"
+                                                required
+                                                value={formData.standardSellingRate}
+                                                onChange={handleChange}
+                                            />
+                                            <div className="invalid-feedback">Please enter the standard selling rate.</div>
+                                        </div> */}
+
                                         <div className="col-12 mb-4">
                                             <div className="form-check ms-1">
                                                 <input

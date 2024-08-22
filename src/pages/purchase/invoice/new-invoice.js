@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Siderbar from '@/helpers/siderbar';
 import axios from 'axios';
 import { getAuthHeader } from '@/helpers/Header';
@@ -8,15 +8,12 @@ import { LoadingPage } from '@/helpers/Loader';
 import withAuth from '@/customhook/withAuth';
 import { handleError } from '@/Api/showError';
 import { handleItemPrice } from '@/features/item/getItemByItemCode';
-import { Autocomplete, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
-import newitem from '@/pages/item/newitem';
+import { Autocomplete, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import SearchSelect from '@/customhook/autocomplete/SeachSelect';
 import addNewSupplier from '@/features/supplier/supplier.services';
 import { handleShowApiError } from '@/features/error/getErrorApi';
 import toast from 'react-hot-toast';
 import { get, post, put } from '@/configs/apiUtils';
-import moment from 'moment';
-import DatePicker from 'react-datepicker';
 
 
 
@@ -417,13 +414,7 @@ const DataTable = ({ head, itemList, addNewItem, removeList, handleItemChange, u
                                 </tbody>
                             </table>
                         </div>
-                        {/* <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', padding: '0px 20px' }}>
-                            <button className="btn btn-primary new-row login-btn" style={{ margin: '0px' }} type="button" onClick={() => addNewItem()} >New Row</button>
-                            <div style={{}}>
-                                <li>Total Quantity : {totalQuan}</li>
-                                <li>Total Amount :  {totalAmount}</li>
-                            </div>
-                        </div> */}
+        
                         <div style={{ width: '100%' }}>
                             <button className="btn btn-primary new-row login-btn" type="button" onClick={() => addNewItem()} >New Row</button>
                         </div>

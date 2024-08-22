@@ -1,10 +1,8 @@
 import { get } from '@/configs/apiUtils';
-import { fetchOutstanding } from '@/customhook/outstanding';
-import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Drawer, IconButton, List, Typography } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Drawer, Typography } from '@mui/material';
 import axios from 'axios';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 
@@ -193,6 +191,7 @@ const ContextMenu = () => {
 
                 {isMenuOpened && <nav className="more-options">
                     <section>
+                        <li onClick={() => handleRoutePage('/item/newitem')}>Create a New Item</li>
                         <li onClick={() => handleRoutePage('/customer/new-customer')}>Create a New Customer</li>
 
                         <li onClick={() => handleRoutePage('/supplier/newsupplier')}>Create a New Supplier</li>

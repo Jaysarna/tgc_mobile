@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import MUIDataTable from 'mui-datatables';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -38,7 +37,7 @@ const DataTable = () => {
             setSampleData(listRes.message);
         } catch (err) {
             console.log(err);
-            if (err.response?.status === 403) {
+            if (err?.response?.status === 403) {
                 sessionStorage.clear();
             } else {
                 handleError(err);
@@ -88,6 +87,17 @@ const DataTable = () => {
                 }
             },
             {
+                name: 'Customer Group',
+                label: 'Customer Group',
+                // options: {
+                //     customBodyRender: (value) => (
+                //         <>
+                //             ${value}
+                //         </>
+                //     )
+                // }
+            },
+            {
                 name: 'Receive Payment',
                 filter: false,
                 options: {
@@ -120,6 +130,7 @@ const DataTable = () => {
         ? tableData.map(item => [
             moment(item[2]).format('DD-MM-yyyy'),
             item[0],
+            item[1],
             item[1],
             item[0],
             item[0],

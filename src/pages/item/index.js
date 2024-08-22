@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import MUIDataTable from 'mui-datatables'
 import Siderbar from '@/helpers/siderbar'
 import axios from 'axios'
@@ -91,6 +91,10 @@ const ItemList = () => {
       label: 'Available Stock'
     },
     {
+      name: 'opening_stock',
+      label: 'Opening Stock'
+    },
+    {
       name: 'item_code',
       label: 'New Invoice',
       options: {
@@ -123,7 +127,8 @@ const ItemList = () => {
         noMatch: 'No Records Found'
       }
     },
-    print: 'false'
+    print: 'false',
+    selectableRows: 'none',
   }
 
   return (
