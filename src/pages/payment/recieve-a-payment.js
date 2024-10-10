@@ -1,14 +1,15 @@
-import { fetchOutstanding } from '@/customhook/outstanding';
 import withAuth from '@/customhook/withAuth';
-import { authHeader, getAuthHeader } from '@/helpers/Header';
+import { getAuthHeader } from '@/helpers/Header';
 import Siderbar from '@/helpers/siderbar';
-import axios from 'axios';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import DeleteIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { post } from '@/configs/apiUtils';
+import { get, post } from '@/configs/apiUtils';
 import toast from 'react-hot-toast';
 import Loader from '@/helpers/Loader';
+import SearchSelect from '@/customhook/autocomplete/SeachSelect';
+import addNewCustomer from '@/features/customer/customer.services';
+import { handleError } from '@/Api/showError';
 // import DeleteIcon from '@mui/icons-material/Delete';
 
 
@@ -18,29 +19,26 @@ const ReceiveAPayment = () => {
 
     // console.log(name)
 
-    async function fetchCSData() {
-        const authHeader = getAuthHeader();
-        try {
-            const response = await axios.get(`https://tgc67.online/api/method/customer_outstanding`, authHeader)
-            // console.log(response.data.message)
-            if (response?.status === 200) {
-                const customer = response.data.message;
-                setCusList(customer)
+    async function fetchCustomerList() {
 
-            }
+        try {
+
+            const res = await get('/resource/Customer')
+            setCusList(res.data)
         }
         catch (err) {
             console.log(err)
-            if (err.response?.status === 403) {
-                alert("Login Expired")
-                router.push('/')
+            if (err?.response?.status === 403) {
+                sessionStorage.clear()
+
             }
             else {
                 handleError(err)
             }
+            setCusList([])
         }
-
     }
+
 
 
     const [paymentData, setPaymentData] = useState({
@@ -164,34 +162,28 @@ const ReceiveAPayment = () => {
         const authHeader = getAuthHeader();
         const apiUrl = 'https://tgc67.online/api/resource/Sales%20Invoice';
         const filters = [
-            ['customer', '=', name],  // Update to use the provided name parameter
+            ['customer', '=', name],  // Using the provided name parameter
             ['docstatus', '=', '1'],
             ['status', '!=', 'Cancel'],
             ['outstanding_amount', '>', '0']
         ];
         const fields = ['name', 'customer', 'grand_total', 'outstanding_amount'];
 
-        const url = `${apiUrl}?filters=${encodeURIComponent(JSON.stringify(filters))}&fields=${encodeURIComponent(JSON.stringify(fields))}`;
-        var requestOptions = {
-            method: 'GET',
-            headers: authHeader.headers,
-            redirect: 'follow'
+        const params = {
+            filters: JSON.stringify(filters),
+            fields: JSON.stringify(fields)
         };
 
-        fetch(url, requestOptions)
-            .then(response => response.json())
-            .then(result => {
-                // console.log(result.data)
-                if (result.data) {
-                    setTableData(result.data)
-                }
+        try {
+            const result = await get(apiUrl, { params, headers: authHeader.headers });
 
-            })
-            .catch(error => {
-                console.log('error', error)
-                setTableData([])
-            });
-
+            if (result.data) {
+                setTableData(result.data); // Assuming setTableData updates your UI
+            }
+        } catch (error) {
+            console.error('Error fetching outstanding invoices:', error);
+            setTableData([]); // Set empty data on error
+        }
     }
 
 
@@ -270,9 +262,22 @@ const ReceiveAPayment = () => {
         // console.log(paymentData)
 
 
-        fetchCSData()
+        fetchCustomerList()
 
     }, [])
+
+    const handleUpdateValue = (value) => {
+        // console.log(value)
+        const newValue = (typeof value === 'object') ? value?.name : value;
+
+        setPaymentData({
+            ...paymentData,
+            party: newValue,
+        });
+        fetchOutstanding(value);
+    };
+
+
 
     return (
         <>
@@ -309,46 +314,19 @@ const ReceiveAPayment = () => {
                                                 <div className="invalid-feedback">Please select the posting date.</div>
                                             </div>
                                         </div>
-                                        {/* <div className="col-12">
-                                            <label htmlFor="paymentMethod" className="form-label">Payment Type</label>
-                                            {/* <select
-                                                name="paymentMethod"
-                                                className="form-select"
-                                                id="paymentMethod"
-                                                required
-                                                value={paymentData.paymentMethod}
-                                                onChange={handlePaymentDataChange}
-                                            >
-                                                <option value="">Select a payment method</option>
-                                                <option value="Credit Card">Recieve</option>
-                                                <option value="Cash">Cash</option>
-                                                <option value="Bank Transfer">Bank Transfer</option>
-                                            </select> 
-                                            <input
-                                                type="text"
-                                                name="payment_type"
-                                                className="form-control"
-                                                id="payment_type"
-                                                required
-                                                value={paymentData.payment_type}
-                                                onChange={handlePaymentDataChange}
-                                            />
-                                        </div>
 
-                                        <div className="col-12 ">
-                                            <label htmlFor="party_type" className="form-label">Party Type</label>
-                                            <input
-                                                type="text"
-                                                name="party_type"
-                                                className="form-control"
-                                                id="party_type"
-                                                value={paymentData.party_type}
-                                                onChange={handlePaymentDataChange}
 
-                                            />
-                                        </div> */}
-                                        <div className="col-12">
-                                            <label htmlFor="party" className="form-label">Customer</label>
+                                        {/* <label htmlFor="paid_amount" className="form-label">Select Customer</label> */}
+
+                                        <SearchSelect
+                                            cusList={cusList}
+                                            handleUpdateValue={handleUpdateValue}
+                                            name="Customer"
+                                            handleAdd={(updatedValue) => {
+                                                addNewCustomer({ customerName: updatedValue })
+                                            }}
+                                        />
+                                        {/* <label htmlFor="party" className="form-label">Customer</label>
                                             <select
                                                 name="party"
                                                 className="form-select"
@@ -367,8 +345,8 @@ const ReceiveAPayment = () => {
                                                 }
 
 
-                                            </select>
-                                            {/* <input
+                                            </select> */}
+                                        {/* <input
                                                 type="text"
                                                 name="party"
                                                 className="form-control"
@@ -377,7 +355,7 @@ const ReceiveAPayment = () => {
                                                 onChange={handlePaymentDataChange}
 
                                             /> */}
-                                        </div>
+
 
                                         <div className="col-12 ">
                                             <label htmlFor="paid_amount" className="form-label">Received Amount</label>

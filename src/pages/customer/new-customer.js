@@ -14,7 +14,7 @@ const NewCustomer = () => {
     const [csGroupList, setCSGroupList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [newGroupName, setNewGroupName] = useState('');
-    const customerTypes = ['Company', 'Individual', 'Proprietorship', 'Partnership'];
+    // const customerTypes = ['Company', 'Individual', 'Proprietorship', 'Partnership'];
     const [isLoading, setIsLoading] = useState(false)
 
     const [customerData, setCustomerData] = useState({
@@ -194,7 +194,23 @@ const NewCustomer = () => {
                                             />
 
                                         </div>
+
                                         <div className="col-12 mb-2">
+                                            <label htmlFor="customerType" className="form-label">Customer Type</label>
+                                            <div className="has-validation">
+                                                <input
+                                                    type="text"
+                                                    name="customerType"
+                                                    className="form-control"
+                                                    id="customerType"
+                                                    required
+                                                    value={customerData.customerType}
+                                                    onChange={handleCustomerDataChange}
+                                                />
+                                                <div className="invalid-feedback">Please enter the Customer Type.</div>
+                                            </div>
+                                        </div>
+                                        {/* <div className="col-12 mb-2">
                                             <label htmlFor="customerType" className="form-label">Customer Type</label>
                                             <Autocomplete
                                                 value={customerData.customerType}
@@ -206,7 +222,7 @@ const NewCustomer = () => {
                                                 renderInput={(params) => <TextField {...params} id="outlined-size-small" size='small' />}
                                             />
                                             <div className="invalid-feedback">Please enter the customer type.</div>
-                                        </div>
+                                        </div> */}
                                         <div className="col-12 mb-2">
                                             <label htmlFor="territory" className="form-label">Territory</label>
                                             <input

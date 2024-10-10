@@ -10,10 +10,11 @@ import Siderbar from '@/helpers/siderbar';
 import { LoadingPage } from '@/helpers/Loader';
 import withAuth from '@/customhook/withAuth';
 import TableSearchBar from '@/customhook/customSearch';
-import { get } from '@/configs/apiUtils';
+import { del, get, put } from '@/configs/apiUtils';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-
+import DeleteIcon from '@mui/icons-material/Delete';
+import toast from 'react-hot-toast';
 
 const columns = [
     {
@@ -35,7 +36,7 @@ const columns = [
     },
     {
         name: "debit_in_account_currency",
-        label: "Debit",
+        label: "+",
         options: {
             filter: true,
             sort: true,
@@ -43,7 +44,7 @@ const columns = [
     },
     {
         name: "credit_in_account_currency",
-        label: "Credit",
+        label: "-",
         options: {
             filter: true,
             sort: true,
@@ -154,6 +155,7 @@ const Index = () => {
         pagination: false,
         search: true,
         reset: true,
+        selectableRows: 'none',
         onSearchChange: handleSearch,
         customFooter: () => (
             <div className="container row p-3">
@@ -194,7 +196,7 @@ const Index = () => {
         ),
     }), [handleSearch, transcation, debit, credit, page, rowsPerPage]);
 
-    console.log(dateRange)
+    // console.log(dateRange)
 
 
     const tableTitle = (
@@ -249,6 +251,55 @@ const Index = () => {
         </div>
     );
 
+
+    async function handleDelete(voucher_no) {
+        try {
+            const res = await put('/resource/Journal Entry/' + voucher_no, {
+                data: {
+                    name: voucher_no,
+                    docstatus: "2"
+                }
+
+            });
+
+            if (res) {
+                const res1 = await del('/resource/Journal Entry/' + voucher_no);
+
+                // console.log(res1)
+                if (res1) {
+                    toast.success('Removed Successfully')
+                    fetchData(page, rowsPerPage);
+                }
+            }
+        }
+        catch (err) {
+            console.log(err)
+        }
+
+
+    }
+
+    const updatedColumn = [
+        ...columns,
+        {
+            name: "actions",
+            label: "Actions",
+            options: {
+                customBodyRender: (value, tableMeta) => {
+                    const voucher_no = tableMeta.rowData[1];
+                    return (
+                        <IconButton
+                            onClick={() => handleDelete(voucher_no)}
+                            aria-label="delete"
+                        >
+                            <DeleteIcon />
+                        </IconButton>
+                    );
+                }
+            }
+        }
+    ]
+
     return (
         <>
             <Siderbar />
@@ -259,8 +310,9 @@ const Index = () => {
                     <MUIDataTable
                         title={tableTitle}
                         data={filteredTranscation}
-                        columns={columns}
+                        columns={updatedColumn}
                         options={options}
+
                     />
                 )}
             </div>
