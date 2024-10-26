@@ -1,4 +1,4 @@
-import { get } from '@/configs/apiUtils';
+import { get, post } from '@/configs/apiUtils';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Drawer, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -16,48 +16,82 @@ const Notification = () => {
         return data.reduce((count, message) => count + (message._seen === null ? 1 : 0), 0);
     };
 
+
+
+
+
+
+
     const setupPushNotifications = async () => {
-        if (!('Notification' in window) || !('serviceWorker' in navigator)) {
-            console.warn("Notifications API or Service Workers are not supported by this browser.");
+        console.log('setupPushNotifications invoked');
+
+        // Check if Notification and Service Worker APIs are supported
+        if (!('Notification' in window)) {
+            console.log("Notifications API is not supported by this browser.");
             return;
         }
 
-        if (Notification.permission === 'default') {
-            try {
+        // Service Worker registration
+        if (!('serviceWorker' in navigator)) {
+            console.log("Service Workers are not supported by this browser.");
+            return;
+        }
+
+        // Check and request notification permissions
+        console.log(Notification.permission)
+
+
+        try {
+            if (Notification.permission === 'default') {
+                console.log('Requesting notification permission...');
                 const permission = await Notification.requestPermission();
+                console.log('Notification permission result:', permission);
+
+                // If permission is granted, proceed to register the service worker
                 if (permission === 'granted') {
-                    const registration = await navigator.serviceWorker.register('/sw.js');
-                    const subscription = await registration.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
-                    });
-                    await saveSubscription(subscription);
+                    await registerServiceWorkerAndSubscribe();
+                } else {
+                    console.log('Notification permission denied.');
                 }
-            } catch (error) {
-                console.error("Failed to request notification permission:", error);
+            } else if (Notification.permission === 'granted') {
+                // Permissions are already granted, register service worker
+                await registerServiceWorkerAndSubscribe();
+            } else {
+                console.log("Notification permissions were denied or are already set.");
             }
-        } else if (Notification.permission === 'granted') {
-            // Notifications are already granted, register service worker
-            const registration = await navigator.serviceWorker.register('/sw.js');
-            const subscription = await registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
-            });
-            await saveSubscription(subscription);
-        } else {
-            console.warn("Notification permissions were denied.");
+        } catch (error) {
+            console.error("Error requesting notification permission:", error);
         }
     };
 
+    const registerServiceWorkerAndSubscribe = async () => {
+        try {
+            const registration = await navigator.serviceWorker.register('/sw.js');
+            const subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+            });
+            await saveSubscription(subscription);
+        } catch (error) {
+            console.error("Failed to register service worker or subscribe:", error);
+        }
+    };
+
+
+
+
+
+
+
+
+
+
+
+
     const saveSubscription = async (subscription) => {
         try {
-            await fetch('/api/save-subscription', {
-                method: 'POST',
-                body: JSON.stringify(subscription),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response = await post('/api/save-subscription', subscription);
+            console.log("Subscription saved successfully:", response);
         } catch (error) {
             console.error("Failed to save subscription:", error);
         }
