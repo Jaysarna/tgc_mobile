@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from 'react';
 import Siderbar from '../../helpers/siderbar';
 import withAuth from '@/customhook/withAuth';
 import { useRouter } from 'next/router';
 import MUIDataTable from 'mui-datatables';
 import { AddIcon, EditIcon } from '@/icons/actions';
 import { handleError } from '@/Api/showError';
-import { getAuthHeader } from '@/helpers/Header';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import moment from 'moment';
 import { get } from '@/configs/apiUtils';
+import { getSupplierList, getSupplierOutstandingList } from '@/features/supplier/supplier.services';
 import Link from 'next/link';
 
 const ItemList = () => {
@@ -32,9 +31,29 @@ const DataTable = () => {
 
     async function fetchData() {
         try {
-            const authHeader = getAuthHeader();
-            const listRes = await axios.get('https://tgc67.online/api/method/supplier_outstanding', authHeader);
-            setTableData(listRes.data.message);
+            const res = await getSupplierOutstandingList();
+            const res1 = await getSupplierList();
+
+            const outstandingData = res.message.map(([name, amount, date]) => ({ name, amount, date }));
+
+            const supplierMap = new Map();
+
+            res1.data.forEach(supplier => {
+                supplierMap.set(supplier.name, { name: supplier.name });
+            });
+
+            outstandingData.forEach(outstanding => {
+                if (supplierMap.has(outstanding.name)) {
+                    supplierMap.set(outstanding.name, { ...supplierMap.get(outstanding.name), ...outstanding });
+                } else {
+                    supplierMap.set(outstanding.name, outstanding);
+                }
+            });
+
+            const mergedData = Array.from(supplierMap.values());
+
+            // console.log(mergedData)
+            setTableData(mergedData);
         } catch (err) {
             setTableData([]);
             console.log(err);
@@ -45,6 +64,8 @@ const DataTable = () => {
             }
         }
     }
+
+
 
     async function fetchSampleData() {
         try {
@@ -70,6 +91,7 @@ const DataTable = () => {
         }
     };
 
+
     useEffect(() => {
         fetchData();
     }, []);
@@ -83,7 +105,7 @@ const DataTable = () => {
                 options: {
                     customBodyRender: (value) => (
                         <div>
-                            {moment(value).format('l')}
+                            {value?.date ? moment(value?.date).format('l') : '-'}
                         </div>
                     )
                 }
@@ -91,7 +113,7 @@ const DataTable = () => {
             {
                 name: 'Supplier Name', options: {
                     customBodyRender: (value) => (
-                        <Link href={`/supplier/${value}/list`}> {value}</Link>
+                        <Link href={`/supplier/${value?.name}/list`}> {value?.name}</Link>
                     )
                 }
             },
@@ -99,7 +121,7 @@ const DataTable = () => {
                 name: 'Outstanding Amount',
                 options: {
                     customBodyRender: (value) => (
-                        <>$ {value}</>
+                        <> {value?.amount ? '$' + value?.amount : '-'}</>
                     )
                 }
             },
@@ -107,10 +129,18 @@ const DataTable = () => {
                 name: 'Make a Payment',
                 options: {
                     customBodyRender: (value, tableMeta) => (
-                        <AddIcon
-                            className="plus-icon-btn"
-                            onClick={() => router.push(`/supplier/${tableMeta.rowData[1]}/make-payment`)}
-                        />
+                        tableMeta.rowData[0]?.amount ?
+                            <AddIcon
+                                className="plus-icon-btn"
+                                onClick={() => router.push(`/supplier/${tableMeta.rowData[0]?.name}/make-payment`)}
+                            />
+                            :
+                            <>
+                                <AddIcon
+                                    className="plus-icon-btn-disable"
+                                />
+                            </>
+
                     )
                 }
             },
@@ -119,7 +149,7 @@ const DataTable = () => {
                 options: {
                     customBodyRender: (value, tableMeta) => (
                         <EditIcon
-                            onClick={() => router.push(`/supplier/${tableMeta.rowData[1]}/edit`)}
+                            onClick={() => router.push(`/supplier/${tableMeta.rowData[1]?.name}/edit`)}
                         />
                     )
                 }
@@ -155,11 +185,11 @@ const DataTable = () => {
 
     const data = !sample
         ? tableData.map(item => [
-            item[2],
-            item[0],
-            item[1],
-            item[0],
-            item[0]
+            item,
+            item,
+            item,
+            item,
+            item
         ])
         : sampleData.map(item => [
             item.supplier,

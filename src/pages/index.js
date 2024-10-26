@@ -1,21 +1,11 @@
 import Head from 'next/head'
-import Image from 'next/image'
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import logo from '../images/logo.jpg'
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import Loader, { LoadingPage } from '../helpers/Loader';
-// import Cookies from 'js-cookie';
-// import styles from '@/styles/Home.module.css'
-
-// const inter = Inter({ subsets: ['latin'] })
+import { LoadingPage } from '../helpers/Loader';
 
 const loginurl = 'https://tgc67.online/api/method/tgc_custom.server_script.login_api.login';
 
-const headers = {
-  "Content-Type": "multipart/form-data",
-};
 
 
 
@@ -25,7 +15,6 @@ export default function Home() {
   const route = useRouter();
   const [isLoad, setLoad] = useState(false)
   useEffect(() => {
-
 
     let api_key1 = sessionStorage.getItem('api_key');
     let api_secret1 = sessionStorage.getItem('api_secret');
@@ -37,15 +26,13 @@ export default function Home() {
       setLoad(true)
     }
   }, [])
-  // console.log(logo)
+
   return (
     <>
       <Head>
         <title>Login</title>
         <meta name="description" content="Login" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* <link rel="icon" href="/favicon.ico" /> */}
-
       </Head>
       {isLoad && <Login />}
     </>
@@ -64,10 +51,6 @@ const Login = () => {
   async function handleLogin(e) {
     setLoad(true);
     e.preventDefault();
-    // let formdata = {
-    //   "usr": username,
-    //   "pwd": password
-    // }
     const formdata = new FormData()
 
     formdata.append('usr', username)
@@ -81,15 +64,11 @@ const Login = () => {
       })
 
       if (loginRes.status === 200) {
-
-        // localStorage.setItem('api_key', loginRes.data.message.api_key)
-        // localStorage.setItem('api_secret', loginRes.data.message.api_secret)
         sessionStorage.setItem('api_key', loginRes.data.message.api_key);
         sessionStorage.setItem('api_secret', loginRes.data.message.api_secret);
         sessionStorage.setItem('userName', loginRes.data.message.username)
 
         setLoad(false);
-        // console.log('fired')
         route.push('/main')
       }
     }
@@ -120,8 +99,7 @@ const Login = () => {
 
                 <div className=" d-flex justify-content-center">
 
-                  {/* <Image src={logo} alt="Logo" width={150} height={150} /> */}
-                  <Image src={'/logo.jpg'} alt="Logo" width={150} height={150} />
+                  <img src={'https://api.newworldtrending.com/apis/uploads/img-1ef781e7-bb5f-463b-a452-a8150f8371a0.webp'} alt="Logo" width={150} height={150} />
 
 
                 </div>
@@ -135,7 +113,6 @@ const Login = () => {
                   <div className="col-12">
                     <label htmlFor="yourUsername" className="form-label">Username</label>
                     <div className=" has-validation">
-                      {/* <span className="input-group-text" id="inputGroupPrepend"><i className="bi bi-person"></i></span> */}
                       <input
                         type="text"
                         name="username"
@@ -167,17 +144,12 @@ const Login = () => {
                   <div className="w-100">
                     <button className="btn btn-primary login-btn" type="submit">Login</button>
                   </div>
-                  {/* <div className="col-12">
-                        <p className="small mb-0">Don't have account? <Link to="/signup">Create an account</Link></p>
-                      </div> */}
+
                 </form>
 
               </div>
             </div>
 
-            {/* <div className="credits">
-                    Designed by <Link to="#"> DMJ Admin </Link>
-                  </div> */}
 
           </div>
         </div>

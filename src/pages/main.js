@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import Siderbar, { ContextMenu } from "../helpers/siderbar";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import withAuth from "@/customhook/withAuth";
 import { handleError } from "@/Api/showError";
@@ -34,7 +33,7 @@ const Main = () => {
         try {
             const res = await axios.get(apiUrl)
             setCardData(res.data.message)
-            console.log(res.data.message)
+            // console.log(res.data.message)
         }
         catch (err) {
             console.log(err)

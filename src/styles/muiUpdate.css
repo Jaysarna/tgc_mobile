@@ -33,3 +33,11 @@
 .css-i4bv87-MuiSvgIcon-root {
   cursor: pointer;
 }
+
+.btn-primary:not(:disabled):not(.disabled).active:focus,
+.btn-primary:not(:disabled):not(.disabled):active:focus,
+.show > .btn-primary.dropdown-toggle:focus {
+  border: none !important;
+
+  box-shadow: none !important;
+}

@@ -98,3 +98,13 @@ const del = async (endpoint) => {
 
 
 export { get, post, put, patch, del };
+
+const Api = {
+    get,
+    post,
+    put,
+    patch,
+    del
+}
+
+export default Api

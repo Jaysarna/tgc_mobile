@@ -26,10 +26,12 @@
     "react-pro-sidebar": "^1.1.0-alpha.1",
     "sass": "^1.75.0",
     "sharp": "^0.32.6",
-    "uid": "^2.0.2"
+    "uid": "^2.0.2",
+    "zustand": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "22.1.0",
+    "terser-webpack-plugin": "^5.3.10",
     "typescript": "5.5.4"
   }
 }

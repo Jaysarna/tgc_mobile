@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import MUIDataTable from "mui-datatables";
-import { getAuthHeader } from "@/helpers/Header";
 import withAuth from "@/customhook/withAuth";
 import Siderbar from "@/helpers/siderbar";
 import { LoadingPage } from "@/helpers/Loader";
@@ -106,15 +105,10 @@ const Index = () => {
         // },
     };
 
-
-
-    const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
-
-            const authheader = getAuthHeader()
 
             try {
                 const baseURL = "https://tgc67.online/api/resource/GL%20Entry";

@@ -1,0 +1,65 @@
+.header-center-lines {
+    color: white !important;
+
+    border-radius: 5px !important;
+
+
+
+
+}
+
+
+.sidebar-list,
+.sidebar-list-shortcut {
+    cursor: pointer;
+
+    gap: 10px;
+
+    &:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+}
+
+
+.sidebar-list-shortcut {
+    color: white;
+}
+
+.menuOuter {
+    position: fixed;
+    right: 40px;
+    bottom: 40px;
+    z-index: 20001;
+
+    button {
+        font-size: 2rem;
+        background-color: var(--primary-color);
+        color: white;
+
+        border-radius: 5px;
+
+        &:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+    }
+}
+
+
+.close-sidebar {
+    background-color: var(--primary-color) !important;
+    color: white;
+
+    border-radius: 5px !important;
+
+    padding: 5px 10px;
+
+    position: absolute;
+    right: 10px;
+
+
+    svg {
+        color: white !important;
+    }
+}

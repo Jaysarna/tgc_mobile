@@ -1,52 +1,41 @@
 // pages/[slug]/edit.js
-
 import { useRouter } from 'next/router';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Siderbar from '@/helpers/siderbar'; // Ensure the correct import path
-import axios from 'axios';
 import withAuth from '@/customhook/withAuth';
-import { authHeader, getAuthHeader } from '@/helpers/Header';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { handleError } from '@/Api/showError';
+import { get } from '@/configs/apiUtils';
+import { updateSupplier } from '@/features/supplier/supplier.services';
 
 const EditCustomer = () => {
     const router = useRouter();
     const { name } = router.query; // Access the dynamic parameter "name"
 
-    const [customerData, setCustomerData] = useState({
-        customerName: '',
-        customerGroup: '',
-        customerType: '',
+    const [supplierData, setSupplierData] = useState({
+        name: '',
+        group: '',
+        type: '',
         country: '',
     });
 
 
     async function fetchCustomerData(nme) {
         if (nme) {
-            const authHeader = getAuthHeader();
             try {
-                const response = await axios.get(`https://tgc67.online/api/resource/Supplier/${nme}`, authHeader)
+                const response = await get(`https://tgc67.online/api/resource/Supplier/${nme}`)
                 // console.log(response.data.data)
-                if (response?.status === 200) {
-                    const customer = response.data.data;
-                    // console.log(customer)
-                    setCustomerData({
-                        customerName: customer.supplier_name,
-                        customerGroup: customer.supplier_group,
-                        customerType: customer.supplier_type,
-                        country: customer.country,
+                if (response?.data) {
+                    const supplier = response.data;
+                    setSupplierData({
+                        name: supplier.supplier_name,
+                        group: supplier.supplier_group,
+                        type: supplier.supplier_type,
+                        country: supplier.country,
                     });
                 }
             }
             catch (err) {
                 console.log(err)
-                if (err.response?.status === 403) {
-                    alert("Login Expired")
-                    router.push('/')
-                }
-                else {
-                    handleError(err)
-                }
             }
         }
 
@@ -54,53 +43,35 @@ const EditCustomer = () => {
 
 
     useEffect(() => {
-
         fetchCustomerData(name)
-
     }, [name]);
 
     const handleCustomerDataChange = (e) => {
         const { name, value } = e.target;
-        setCustomerData({
-            ...customerData,
+        setSupplierData({
+            ...supplierData,
             [name]: value,
         });
     };
 
-    const handleUpdateCustomer = async (e) => {
+    const handleUpdateSupplier = async (e) => {
         e.preventDefault();
-        const authHeader = getAuthHeader();
-        // Update the customer data based on the slug
         if (name) {
-            // Replace 'update_customer_url' with the actual API endpoint to update customer data
-            const apiUrl = `https://tgc67.online/api/resource/Supplier/${name}`;
-
             const requestData = {
                 data: {
-                    supplier_name: customerData.customerName,
-                    supplier_type: customerData.customerType,
-                    supplier_group: customerData.customerGroup,
-                    country: customerData.country,
+                    supplier_name: supplierData.name,
+                    supplier_type: supplierData.type,
+                    supplier_group: supplierData.group,
+                    country: supplierData.country,
                 },
             };
 
             try {
-                const response = await axios.put(apiUrl, requestData, authHeader);
+                const response = updateSupplier(name, requestData)
+                // console.log(response)
 
-                if (response?.status === 200) {
-                    alert("Supplier Updated Successfully");
-                    router.push('/supplier');
-                }
             } catch (error) {
-
-                if (error.response?.status === 403) {
-                    sessionStorage.clear()
-                    alert("Login Expired")
-                    router.push('/')
-                }
-                else {
-                    handleError(error)
-                }
+                console.log(error)
             }
         }
     };
@@ -134,44 +105,44 @@ const EditCustomer = () => {
                                         </div>
                                     </div>
 
-                                    <form onSubmit={handleUpdateCustomer} method="post" className="row g-3 needs-validation">
+                                    <form onSubmit={handleUpdateSupplier} method="post" className="row g-3 needs-validation">
                                         <div className="col-12">
-                                            <label htmlFor="customerName" className="form-label">Supplier Name</label>
+                                            <label htmlFor="name" className="form-label">Supplier Name</label>
                                             <div className="has-validation">
                                                 <input
                                                     type="text"
-                                                    name="customerName"
+                                                    name="name"
                                                     className="form-control"
-                                                    id="customerName"
+                                                    id="name"
                                                     required
-                                                    value={customerData.customerName}
+                                                    value={supplierData.name}
                                                     onChange={handleCustomerDataChange}
                                                 />
                                                 <div className="invalid-feedback">Please enter the Supplier name.</div>
                                             </div>
                                         </div>
                                         <div className="col-12 mb-4">
-                                            <label htmlFor="customerGroup" className="form-label">Supplier Group</label>
+                                            <label htmlFor="group" className="form-label">Supplier Group</label>
                                             <input
                                                 type="text"
-                                                name="customerGroup"
+                                                name="group"
                                                 className="form-control"
-                                                id="customerGroup"
+                                                id="group"
                                                 required
-                                                value={customerData.customerGroup}
+                                                value={supplierData.group}
                                                 onChange={handleCustomerDataChange}
                                             />
                                             <div className="invalid-feedback">Please enter the Supplier group.</div>
                                         </div>
                                         <div className="col-12 mb-4">
-                                            <label htmlFor="customerType" className="form-label">Supplier Type</label>
+                                            <label htmlFor="type" className="form-label">Supplier Type</label>
                                             <input
                                                 type="text"
-                                                name="customerType"
+                                                name="type"
                                                 className="form-control"
-                                                id="customerType"
+                                                id="type"
                                                 required
-                                                value={customerData.customerType}
+                                                value={supplierData.type}
                                                 onChange={handleCustomerDataChange}
                                             />
                                             <div className="invalid-feedback">Please enter the Supplier type.</div>
@@ -184,7 +155,7 @@ const EditCustomer = () => {
                                                 className="form-control"
                                                 id="country"
                                                 required
-                                                value={customerData.country}
+                                                value={supplierData.country}
                                                 onChange={handleCustomerDataChange}
                                             />
                                             <div className="invalid-feedback">Please enter the default price.</div>

@@ -1,7 +1,5 @@
-
 import { toast } from 'react-hot-toast';
-import { get, post } from '@/configs/apiUtils';
-import { useRouter } from 'next/router';
+import { get, post, put } from '@/configs/apiUtils';
 import { handleShowApiError } from '../error/getErrorApi';
 
 const addNewSupplier = async (
@@ -34,9 +32,6 @@ const addNewSupplier = async (
             {
                 loading: 'Adding new supplier...',
                 success: (res) => res?.data.name ? 'New Supplier Added Successfully' : 'Failed to add new supplier. Please try again.',
-                // error: 'Failed to add new supplier. Please try again.',
-
-
             },
 
         )
@@ -50,33 +45,44 @@ const addNewSupplier = async (
 
 export const getSupplierList = async () => {
     try {
-        // const res = await toast.promise(
-        //     get('resource/Supplier'),
-        //     {
-        //         loading: '',
-        //         success: (res) => res && '',
-        //         error: 'Reload ...',
-        //         style: {
-        //             minWidth: '250px',
-        //             borderRadius: '8px',
-        //             padding: '16px',
-        //             color: '#ffffff', // Text color
-        //             backgroundColor: '#4caf50', // Success background color
-        //             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        //         },
-
-
-        //         icon: (status) => {
-        //             return status === 'loading' ? '⏳' : status === 'success' ? '✅' : '❌';
-        //         },
-        //     }
-        // )
-
         const res = await get('resource/Supplier');
         return res
     } catch (err) {
         handleShowApiError(err)
     }
 }
+export const getSupplierOutstandingList = async () => {
+    try {
+
+        const res = await get('method/supplier_outstanding');
+        return res
+    } catch (err) {
+        handleShowApiError(err)
+    }
+}
+
+
+
+
+
+
+export const updateSupplier = async (name, data) => {
+    try {
+        toast.promise(put(`/resource/Supplier/${name}`, data),
+            {
+                loading: 'Updating supplier...',
+                success: (res) => res?.data.name ? 'Supplier Details updated Successfully' : 'Failed to update supplier. Please try again.',
+            },
+
+        )
+
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+
+
+
 
 export default addNewSupplier;
