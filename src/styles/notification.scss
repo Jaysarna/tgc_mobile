@@ -8,6 +8,7 @@
 .bell-icon {
   position: relative;
 }
+
 .notify-count {
   position: absolute;
   font-size: 13px;
@@ -17,11 +18,14 @@
 
 .notification-drawer {
   position: relative;
+
   /* width: 300px; */
-  .css-1160xiw-MuiPaper-root-MuiDrawer-paper {
+  .css-1160xiw-MuiPaper-root-MuiDrawer-paper,
+  .css-1ab2xsx {
     max-width: 320px;
     width: 100%;
   }
+
 
   .notifications {
     width: 100%;
@@ -77,9 +81,11 @@
     .notify-dot {
       background-color: white;
     }
+
     h2 {
       color: #7f56d994;
     }
+
     p {
       color: #918e8e;
     }
@@ -139,6 +145,7 @@
 .limit-1 {
   -webkit-line-clamp: 1;
 }
+
 .limit-2 {
   -webkit-line-clamp: 2;
 }

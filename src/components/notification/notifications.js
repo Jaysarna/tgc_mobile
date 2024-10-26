@@ -133,6 +133,7 @@ const Notification = () => {
                 open={isOpenNotify}
                 onClose={toggleNotificationDrawer}
                 className='notification-drawer'
+
             >
                 <h3 className='text-center mt-2'>Notifications</h3>
                 <hr />
