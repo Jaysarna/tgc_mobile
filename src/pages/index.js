@@ -42,8 +42,8 @@ export default function Home() {
 
 const Login = () => {
 
-  const [username, setUsername] = useState('administrator');
-  const [password, setPassword] = useState('admin');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const [isLoad, setLoad] = useState(false)
   const route = useRouter()

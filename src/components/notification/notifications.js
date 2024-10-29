@@ -3,14 +3,25 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Drawer, Typo
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import NotificationIcon from '@mui/icons-material/NotificationsActive';
+import { useNotificationPermission } from '@/customhook/notification';
 
 
 const Notification = () => {
+
+    const { permission, requestPermission } = useNotificationPermission();
+
     const [isOpenNotify, setOpenNotify] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const [unseenCount, setUnseenCount] = useState(0);
 
-    const toggleNotificationDrawer = () => setOpenNotify(prev => !prev);
+    const toggleNotificationDrawer = () => {
+        setOpenNotify(prev => !prev);
+        if (permission === 'default') {
+            requestPermission()
+        }
+    }
+
+
 
     const countUnseenMessages = (data) => {
         return data.reduce((count, message) => count + (message._seen === null ? 1 : 0), 0);

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import withAuth from "@/customhook/withAuth";
 import { handleError } from "@/Api/showError";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import Siderbar from '@/helpers/siderbar';
+import { get } from "@/configs/apiUtils";
 
 const apiUrl = 'https://tgc67.online/api/method/number_card';
 
@@ -31,8 +31,8 @@ const Main = () => {
 
     async function fetchData() {
         try {
-            const res = await axios.get(apiUrl)
-            setCardData(res.data.message)
+            const res = await get(apiUrl)
+            setCardData(res.message)
             // console.log(res.data.message)
         }
         catch (err) {

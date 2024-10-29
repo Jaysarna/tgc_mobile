@@ -73,12 +73,11 @@ const Sidebar = ({ children }) => {
 
     const mainMenuItems = [
         { label: 'Item Inventory', route: '/item', icon: <InventoryIcon /> },
-        { label: 'Supplier Owed', route: '/supplier', icon: <MonetizationOnIcon /> }, // Represents money owed
-        { label: 'Customer List', route: '/customer', icon: <PeopleIcon /> }, // Represents customers
-        { label: 'All Purchase Invoices', route: '/purchase/invoice', icon: <ShoppingCartIcon /> }, // Shopping cart for purchases
-        { label: 'All Sales Invoices', route: '/sales/invoice', icon: <ShoppingCartIcon /> }, // Shopping cart for sales
-        { label: 'Transaction List', route: '/transcation/list', icon: <AssessmentIcon /> }, // Represents assessments or analysis
-        { label: 'Expenses List', route: '/expenses/list', icon: <AttachMoneyIcon /> }, // Represents expenses or financial outflows
+        { label: 'Supplier Owed', route: '/supplier', icon: <MonetizationOnIcon /> },
+        { label: 'Customer List', route: '/customer', icon: <PeopleIcon /> }, { label: 'All Purchase Invoices', route: '/purchase/invoice', icon: <ShoppingCartIcon /> },
+        { label: 'All Sales Invoices', route: '/sales/invoice', icon: <ShoppingCartIcon /> },
+        { label: 'Transaction List', route: '/transcation/list', icon: <AssessmentIcon /> },
+        { label: 'Expenses List', route: '/expenses/list', icon: <AttachMoneyIcon /> },
     ];
 
     const otherFeaturesItems = [

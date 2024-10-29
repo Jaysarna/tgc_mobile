@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Store } from 'react-notifications-component';
 import 'react-notifications-component/dist/theme.css';
 
@@ -42,3 +43,24 @@ const useNotifications = () => {
 };
 
 export default useNotifications;
+
+
+
+
+export function useNotificationPermission() {
+    const [permission, setPermission] = useState(Notification.permission);
+
+    // Function to request notification permission
+    const requestPermission = async () => {
+        if (Notification.permission === 'default') {
+            const result = await Notification.requestPermission();
+            setPermission(result);
+        }
+    };
+
+    useEffect(() => {
+        setPermission(Notification.permission);
+    }, []);
+
+    return { permission, requestPermission };
+}
