@@ -1,13 +1,13 @@
-
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Siderbar from '@/helpers/siderbar';
 import axios from 'axios';
-import { authHeader, getAuthHeader } from '@/helpers/Header';
+import WestIcon from '@mui/icons-material/West';
 import { uid } from 'uid';
 import withAuth from '@/customhook/withAuth';
 import { handleError } from '@/Api/showError';
-import { handleItemPrice } from '@/features/item/getItemByItemCode';
+import AgainstTable from '@/components/Datatable/AgainstTable';
+import { get } from '@/configs/apiUtils';
 
 const url = 'https://tgc67.online/api/resource/Purchase%20Invoice/';
 
@@ -33,16 +33,15 @@ const view = () => {
 
 
     async function fetchCSData() {
-        const authHeader = getAuthHeader();
         // console.log(invoice)
         if (invoice) {
             try {
-                const response = await axios.get(url + invoice, authHeader)
-                console.log(response.data.data)
-                if (response?.status === 200) {
-                    const customer = response.data.data;
+                const response = await get(url + invoice)
+                // console.log(response.data.data)
+                if (response?.data) {
+                    const customer = response.data;
                     setCustomerData({
-                        customerName: customer.supplier_name, // Initialize with an empty string
+                        customerName: customer.supplier_name,
                         dueDate: customer.due_date,
 
                         items: customer.items
@@ -51,12 +50,6 @@ const view = () => {
             }
             catch (error) {
                 console.log(error)
-                if (error.response?.status === 403) {
-                    sessionStorage.clear()
-                }
-                else {
-                    handleError(error)
-                }
             }
         }
 
@@ -99,85 +92,92 @@ const view = () => {
     return (
         <>
             <Siderbar />
-            <div>
-                <div className="col-lg-12 itemOuter mt-3">
-                    <h4 className="text-center"></h4>
-                    <div className="rown">
-                        <div className="col-md-12 d-flex flex-column align-items-center justify-content-center">
-                            <div className="card mb-3" style={{ position: 'relative' }}>
-                                <div className="card-body">
-
-                                    <div className="pt pb-2">
-                                        <h5 className="card-title text-center pb-0 fs-4"> Invoice Details</h5>
+            <div className="col-lg-12 itemOuter mt-3">
+                <h4 className="text-center"></h4>
+                <div className="rown">
+                    <div className="col-md-12 d-flex flex-column align-items-center justify-content-center">
+                        <div className="card mb-3" style={{ position: 'relative' }}>
+                            <div className="card-body">
+                                <div className='' style={{ position: 'absolute', left: '40px', top: '20px' }} onClick={() => {
+                                    router.push('/purchase/invoice')
+                                }}>
+                                    <div className="btn btn-primary iconOuter cancelIcon"  >
+                                        <WestIcon />
                                     </div>
-                                    <div className='' style={{ position: 'absolute', right: '20px', top: '20px' }} onClick={() => {
-                                        router.push('/purchase/invoice')
-                                    }}>
-                                        <div className="btn btn-primary iconOuter cancelIcon"  >
-                                            <i className="fa-solid fa-xmark"></i>
-                                        </div>
-                                    </div>
-
-                                    <form method="post" className="row g-3 needs-validation">
-                                        <div className="col-12 mb-4">
-                                            <label htmlFor="dueDate" className="form-label">Invoice Name</label>
-                                            <input
-                                                type="text"
-
-                                                className="form-control"
-                                                id="dueDate"
-                                                value={invoice}
-
-                                                readOnly
-                                            />
-                                        </div>
-                                        <div className="col-12 mb-4">
-                                            <label htmlFor="dueDate" className="form-label">Supplier Name</label>
-                                            <input
-                                                type="text"
-
-                                                className="form-control"
-                                                id="dueDate"
-                                                value={customerData.customerName}
-
-                                                readOnly
-                                            />
-                                        </div>
-
-                                        <div className="col-12 mb-4">
-                                            <label htmlFor="dueDate" className="form-label">Due Date</label>
-                                            <input
-                                                type="date"
-                                                name="dueDate"
-                                                className="form-control"
-                                                id="dueDate"
-                                                value={customerData.dueDate}
-
-                                                readOnly
-                                            />
-                                        </div>
-
-
-                                        <DataTable
-                                            head={[
-                                                "Item Name",
-                                                "Quantity",
-                                                "Rate",
-                                                "Amount",
-                                            ]}
-                                            title='Customer'
-                                            itemList={customerData.items}
-
-                                        />
-
-                                        <div className="w-100">
-                                            <button className="btn btn-primary login-btn" type="button" onClick={() => {
-                                                router.push('/purchase/invoice')
-                                            }}>Cancel Invoice</button>
-                                        </div>
-                                    </form>
                                 </div>
+                                <div className="pt pb-2">
+                                    <h5 className="card-title text-center pb-0 fs-4"> Invoice Details</h5>
+                                </div>
+                                <div className='' style={{ position: 'absolute', right: '20px', top: '20px' }} onClick={() => {
+                                    router.push('/purchase/invoice')
+                                }}>
+                                    <div className="btn btn-primary iconOuter cancelIcon"  >
+                                        <i className="fa-solid fa-xmark"></i>
+                                    </div>
+                                </div>
+
+                                <form method="post" className="row g-3 needs-validation">
+                                    <div className="col-12 mb-4">
+                                        <label htmlFor="dueDate" className="form-label">Invoice Name</label>
+                                        <input
+                                            type="text"
+
+                                            className="form-control"
+                                            id="dueDate"
+                                            value={invoice}
+
+                                            readOnly
+                                        />
+                                    </div>
+                                    <div className="col-12 mb-4">
+                                        <label htmlFor="dueDate" className="form-label">Supplier Name</label>
+                                        <input
+                                            type="text"
+
+                                            className="form-control"
+                                            id="dueDate"
+                                            value={customerData.customerName}
+
+                                            readOnly
+                                        />
+                                    </div>
+
+                                    <div className="col-12 mb-4">
+                                        <label htmlFor="dueDate" className="form-label">Due Date</label>
+                                        <input
+                                            type="date"
+                                            name="dueDate"
+                                            className="form-control"
+                                            id="dueDate"
+                                            value={customerData.dueDate}
+
+                                            readOnly
+                                        />
+                                    </div>
+
+
+                                    <DataTable
+                                        head={[
+                                            "Item Name",
+                                            "Quantity",
+                                            "Rate",
+                                            "Amount",
+                                        ]}
+                                        title='Customer'
+                                        itemList={customerData.items}
+
+                                    />
+
+                                    <div className="w-100">
+                                        <button className="btn btn-primary login-btn" type="button" onClick={() => {
+                                            router.push('/purchase/invoice')
+                                        }}>Cancel Invoice</button>
+                                    </div>
+                                </form>
                             </div>
+
+
+                            <AgainstTable type="Purchase Invoice" />
                         </div>
                     </div>
                 </div>
@@ -327,3 +327,21 @@ const TableDataList = ({ item, removeList, handleItemChange }) => {
 
 
 export default withAuth(view);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

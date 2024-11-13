@@ -8,6 +8,7 @@ import { uid } from 'uid';
 import withAuth from '@/customhook/withAuth';
 import { handleError } from '@/Api/showError';
 import { handleItemPrice } from '@/features/item/getItemByItemCode';
+import AgainstTable from '@/components/Datatable/AgainstTable';
 
 const url = 'https://tgc67.online/api/resource/Sales%20Invoice/';
 
@@ -179,6 +180,9 @@ const view = () => {
                                         </div>
                                     </form>
                                 </div>
+
+                                <AgainstTable type="Sales Invoice" />
+
                             </div>
                         </div>
                     </div>

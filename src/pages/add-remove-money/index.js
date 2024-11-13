@@ -1,8 +1,6 @@
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Siderbar from '@/helpers/siderbar';
-import axios from 'axios';
-import { getAuthHeader } from '@/helpers/Header';
 import { uid } from 'uid';
 import withAuth from '@/customhook/withAuth';
 import { handleError } from '@/Api/showError';
@@ -32,7 +30,6 @@ const AddRemoveForm = () => {
         referenceNumber: '',
         amount: 0,
         referenceDate: new Date().toISOString().substr(0, 10),
-        // dueDate: new Date(new Date().getTime() + 10 * 24 * 60 * 60 * 1000).toISOString().substr(0, 10), // Set dueDate 10 days ahead of postingDate
         items: [{
             uid: uid(),
             account: '',

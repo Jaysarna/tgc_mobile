@@ -221,6 +221,9 @@ input::-webkit-inner-spin-button {
   /* border: solid 1px black; */
   margin: auto;
   padding: 10px;
+
+  max-width: 900px;
+  width: 100%;
 }
 
 @media (max-width: 450px) {

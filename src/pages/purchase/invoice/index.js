@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from 'react';
 import Siderbar from '@/helpers/siderbar';
 import withAuth from '@/customhook/withAuth';
 import { useRouter } from 'next/router';
 import MUIDataTable from 'mui-datatables';
-
-import { authHeader, getAuthHeader } from '@/helpers/Header';
 import { handleError } from '@/Api/showError';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { AddIcon } from '@/icons/actions';
@@ -17,7 +14,6 @@ const ItemList = () => {
     const router = useRouter();
 
     async function fetchCsList() {
-        const authHeader = getAuthHeader();
         const apiUrl = 'https://tgc67.online/api/resource/Purchase%20Invoice';
         const filters = [
             ['docstatus', '=', '1'],

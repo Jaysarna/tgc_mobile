@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 
 
 export function handleError(error) {
@@ -15,7 +16,7 @@ export function handleError(error) {
       const raiseException = firstObject.raise_exception;
 
       // console.log('Message:', message);
-      return alert(title)
+      return toast.error(title)
     } else {
       console.error('Invalid JSON structure');
     }
