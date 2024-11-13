@@ -143,7 +143,7 @@ const DataTable = ({ tableData }) => {
         },
         {
             name: 'advance_received',
-            label: 'Advance Amount',
+            label: 'Total Amount Pay',
             options: {
                 customBodyRender: (value) => {
                     return (
