@@ -1,4 +1,3 @@
-import { fetchOutstanding } from '@/customhook/outstanding';
 import withAuth from '@/customhook/withAuth';
 import { authHeader, getAuthHeader } from '@/helpers/Header';
 import Siderbar from '@/helpers/siderbar';
@@ -140,18 +139,12 @@ const MakeAPayment = () => {
             // console.log(res)
             if (res.status === 200) {
                 alert(`${res.data.data.name} Made a Payment`);
-                router.push('/supplier')
+                router.push('/main')
             }
 
         } catch (err) {
             console.log(err.response.data);
-            if (err.response?.status === 403) {
-                alert("Login Expired")
-                router.push('/')
-            }
-            else {
-                handleError(err)
-            }
+
         }
 
     };
@@ -523,7 +516,7 @@ const TableDataList = ({ amount, name, customer, total, input, index, handleInpu
                             className="form-control"
                             id="customerName"
                             required
-                            value={input}
+                            value={input || 0}
                             onChange={(e) => handleInputChange(index, e.target.value)}
 
                         />

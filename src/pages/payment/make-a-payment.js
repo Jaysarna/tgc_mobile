@@ -38,13 +38,7 @@ const MakeAPayment = () => {
         catch (err) {
             console.log(err)
             setCusList([])
-            if (err.response?.status === 403) {
-                toast.error("Login Expired")
-                router.push('/')
-            }
-            else {
-                handleError(err)
-            }
+
         }
 
 
@@ -147,26 +141,9 @@ const MakeAPayment = () => {
                 toast.success(`${res.data.name} Made a Payment`)
                 router.push('/customer')
             }
-            // const res = await axios.post(
-            //     'https://tgc67.online/api/resource/Payment%20Entry',
-            //     paymentData1,
-            //     authHeader
-            // );
-            // // console.log(res)
-            // if (res.status === 200) {
-            //     alert(`${res.data.data.name} Made a Payment`);
-            //     router.push('/supplier')
-            // }
 
         } catch (err) {
             console.log(err.response?.data);
-
-            if (err.response?.status === 403) {
-                sessionStorage.clear()
-            }
-            else {
-                handleError(err)
-            }
         }
         setIsLoading(false)
 
