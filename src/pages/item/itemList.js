@@ -53,10 +53,10 @@ const ItemList = () => {
         }
       }
     },
-    {
-      name: 'actual_qty',
-      label: 'QTY Purchased'
-    },
+    // {
+    //   name: 'actual_qty',
+    //   label: 'QTY Purchased'
+    // },
     {
       name: 'supplier_price',
       label: 'Supplier Price'

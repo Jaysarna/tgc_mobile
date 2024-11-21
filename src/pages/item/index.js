@@ -64,10 +64,10 @@ const ItemList = () => {
       }
     },
 
-    {
-      name: 'actual_qty',
-      label: 'QTY Purchased'
-    },
+    // {
+    //   name: 'actual_qty',
+    //   label: 'QTY Purchased'
+    // },
     {
       name: 'supplier_price',
       label: 'Supplier Price',
@@ -90,10 +90,10 @@ const ItemList = () => {
       name: 'actual_qty',
       label: 'Available Stock'
     },
-    {
-      name: 'opening_stock',
-      label: 'Opening Stock'
-    },
+    // {
+    //   name: 'opening_stock',
+    //   label: 'Opening Stock'
+    // },
     {
       name: 'item_code',
       label: 'New Invoice',
