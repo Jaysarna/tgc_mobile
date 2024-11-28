@@ -35,6 +35,22 @@ const columns = [
         },
     },
     {
+        name: "party",
+        label: "Party",
+        options: {
+            filter: true,
+            sort: true,
+        },
+    },
+    {
+        name: "party_type",
+        label: "Party Type",
+        options: {
+            filter: true,
+            sort: true,
+        },
+    },
+    {
         name: "debit_in_account_currency",
         label: "+",
         options: {
@@ -84,7 +100,7 @@ const Index = () => {
         try {
             const baseURL = "https://tgc67.online/api/resource/GL%20Entry";
             const filters = encodeURIComponent(JSON.stringify([["account", "=", "Cash - TGC"]]));
-            const fields = encodeURIComponent(JSON.stringify(["posting_date", "account", "remarks", "debit_in_account_currency", "credit_in_account_currency", "against", "voucher_no"]));
+            const fields = encodeURIComponent(JSON.stringify(["posting_date", "account", "party_type", "party", "remarks", "debit_in_account_currency", "credit_in_account_currency", "against", "voucher_no"]));
             const limit = rowsPerPage;
             const offset = page * rowsPerPage;
             const orderBy = "posting_date";
