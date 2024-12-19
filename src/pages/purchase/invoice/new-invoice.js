@@ -97,10 +97,8 @@ const InvoiceData = () => {
     const [cusList, setCusList] = useState([])
 
     async function fetchSupplier() {
-        const authHeader = getAuthHeader()
         try {
-            const res = await get('/resource/Supplier')
-            // const res = await axios.get('https://tgc67.online/api/resource/Supplier', authHeader)
+            const res = await get('/resource/Supplier?&limit_start=1&limit_page_length=100')
             setCusList(res.data);
         } catch (err) {
             console.log(err);
@@ -157,8 +155,6 @@ const InvoiceData = () => {
 
 
         try {
-
-            // let response1 = await axios.post(apiUrl, sampleRequestData, authHeader);
 
             let response1 = await post('/resource/Purchase%20Invoice', sampleRequestData)
 
@@ -266,10 +262,7 @@ const InvoiceData = () => {
                                                 handleUpdateValue={handleUpdateValue}
                                                 name="Supplier"
                                                 handleAdd={(updatedValue) => {
-
-                                                    // console.log('=---------fireing', updatedValue)
                                                     addNewSupplier({ supplierName: updatedValue })
-
                                                 }}
 
                                             />
@@ -414,7 +407,7 @@ const DataTable = ({ head, itemList, addNewItem, removeList, handleItemChange, u
                                 </tbody>
                             </table>
                         </div>
-        
+
                         <div style={{ width: '100%' }}>
                             <button className="btn btn-primary new-row login-btn" type="button" onClick={() => addNewItem()} >New Row</button>
                         </div>

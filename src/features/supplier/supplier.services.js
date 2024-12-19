@@ -43,9 +43,10 @@ const addNewSupplier = async (
 };
 
 
-export const getSupplierList = async () => {
+export const getSupplierList = async (page = 1, limit = 200) => {
     try {
-        const res = await get('resource/Supplier');
+        const res = await get(`resource/Supplier?&limit_start=${page}&limit_page_length=${limit}`);
+
         return res
     } catch (err) {
         handleShowApiError(err)

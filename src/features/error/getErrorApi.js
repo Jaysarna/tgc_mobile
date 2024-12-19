@@ -40,7 +40,7 @@ async function showApiError(err) {
         toast.error(plainText);
     }
     catch (err) {
-        console.log('fired')
+        // console.log('fired')
         console.log(err)
         // toast.error('Please Try Again')
     }

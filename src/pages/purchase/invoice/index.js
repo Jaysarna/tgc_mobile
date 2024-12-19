@@ -9,58 +9,58 @@ import { AddIcon } from '@/icons/actions';
 import { get } from '@/configs/apiUtils';
 import moment from 'moment';
 
-const ItemList = () => {
+const PurchaseInvoiceList = () => {
     const [tableData, setTableData] = useState([]);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const router = useRouter();
 
-    async function fetchCsList() {
+    async function fetchPurchaseInvoiceList(page = 0, rowsPerPage = 10) {
         const apiUrl = 'https://tgc67.online/api/resource/Purchase%20Invoice';
         const filters = [
             ['docstatus', '=', '1'],
             ['status', '!=', 'Cancel'],
-
         ];
-        const fields = ['name', 'supplier', 'grand_total', 'outstanding_amount', 'posting_date', 'is_return', 'custom_payment_amount_in_advance'];
-        const orderBy = "creation desc";
+        const fields = ['name', 'supplier', 'grand_total', 'outstanding_amount', 'posting_date', 'is_return', 'custom_payment_amount_in_advance', 'total_qty'];
+        const orderBy = "outstanding_amount desc";
 
-        // Construct the dynamic URL
-        const url = `${apiUrl}?filters=${encodeURIComponent(JSON.stringify(filters))}&fields=${encodeURIComponent(JSON.stringify(fields))}&order_by=${orderBy}`;
+        // Construct the dynamic URL with pagination
+        const url = `${apiUrl}?filters=${encodeURIComponent(JSON.stringify(filters))}&fields=${encodeURIComponent(JSON.stringify(fields))}&order_by=${orderBy}&limit_start=${page * rowsPerPage}&limit_page_length=${rowsPerPage}`;
 
         try {
-            const listRes = await get(url)
-            // console.log(listRes.data)
-            setTableData(listRes?.data)
+            const listRes = await get(url);
+            setTableData(listRes?.data);
+            setTotalRecords(listRes?.data?.length);
         }
         catch (err) {
-            console.log(err)
+            console.log(err);
             if (err.response?.status === 403) {
-                alert("Login Expired")
-                router.push('/')
+                alert("Login Expired");
+                router.push('/');
             }
             else {
-                handleError(err)
+                handleError(err);
             }
         }
     }
 
     useEffect(() => {
-        fetchCsList();
-    }, []);
+        fetchPurchaseInvoiceList(page, rowsPerPage);
+    }, [page, rowsPerPage]);
 
     return (
         <div>
             <Siderbar />
-            <DataTable tableData={tableData} />
+            <DataTable tableData={tableData} fetchPurchaseInvoiceList={fetchPurchaseInvoiceList} totalRecords={totalRecords} page={page} setPage={setPage} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} />
         </div>
     );
 };
 
-export default withAuth(ItemList);
+export default withAuth(PurchaseInvoiceList);
 
-const DataTable = ({ tableData }) => {
-    const [sample, setSample] = useState(0);
+const DataTable = ({ tableData, totalRecords, page, setPage, rowsPerPage, setRowsPerPage, fetchPurchaseInvoiceList }) => {
     const router = useRouter();
-
 
     const columns = [
         {
@@ -87,26 +87,24 @@ const DataTable = ({ tableData }) => {
             name: 'name',
             label: 'Supplier Name',
             options: {
-
                 customBodyRender: (value, tableMeta) => {
-                    const name = tableMeta.rowData[1]
+                    const name = tableMeta.rowData[1];
 
                     return (
-                        < div className='table-row__info' style={{ cursor: 'pointer' }} onClick={() => {
+                        <div className='table-row__info' style={{ cursor: 'pointer' }} onClick={() => {
                             router.push(`/purchase/invoice/view/${value}`)
                         }}>
                             <p className='table-row__name'>{name}</p>
                             <span className='table-row__small ms-1'>{value}</span>
-                        </div >
-                    )
+                        </div>
+                    );
                 }
             }
         },
         {
             name: 'is_return',
             options: {
-                display: false,
-
+                display: false
             }
         },
 
@@ -119,7 +117,7 @@ const DataTable = ({ tableData }) => {
                         <>
                             $ {value}
                         </>
-                    )
+                    );
                 }
             }
         },
@@ -132,7 +130,7 @@ const DataTable = ({ tableData }) => {
                         <>
                             $ {value}
                         </>
-                    )
+                    );
                 }
             }
         },
@@ -145,22 +143,26 @@ const DataTable = ({ tableData }) => {
                         <>
                             $ {value}
                         </>
-                    )
+                    );
                 }
             }
+        },
+        {
+            name: 'total_qty',
+            label: 'Total Quantity',
         },
         {
             name: 'payment',
             label: 'Make a Payment',
             options: {
                 customBodyRender: (dataIndex, tableMeta) => {
-                    const name = tableMeta.rowData[1]
+                    const name = tableMeta.rowData[1];
                     return (
                         <AddIcon
                             className="plus-icon-btn"
                             onClick={() => router.push(`/supplier/${name}/make-payment`)}
                         />
-                    )
+                    );
                 }
             }
         },
@@ -170,39 +172,27 @@ const DataTable = ({ tableData }) => {
             label: 'Return',
             options: {
                 customBodyRender: (dataIndex, tableMeta) => {
-                    const name = tableMeta.rowData[1]
-                    const invoice = tableMeta.rowData[2]
-                    const is_return = tableMeta.rowData[3]
+                    const name = tableMeta.rowData[1];
+                    const invoice = tableMeta.rowData[2];
+                    const is_return = tableMeta.rowData[3];
                     if (!is_return) {
-
                         return (
                             <button className="btn btn-primary" onClick={() => {
-                                router.push(`/purchase/invoice/${invoice}/${name}/return`)
+                                router.push(`/purchase/invoice/${invoice}/${name}/return`);
                             }}>Return</button>
-                        )
+                        );
                     }
                     else {
                         return (
                             <>
                                 --
                             </>
-                        )
+                        );
                     }
-
                 }
             }
         }
     ];
-
-    // const data = tableData.map(item => [
-    //     {
-    //         item.customer,
-    //         itme.name
-    //     },
-    //     item.grand_total,
-    //     item.outstanding_amount,
-    //     null
-    // ]);
 
     const options = {
         filterType: 'dropdown',
@@ -213,7 +203,18 @@ const DataTable = ({ tableData }) => {
             }
         },
         print: false,
-
+        serverSide: true,
+        count: (totalRecords >= 10 ? (totalRecords * (page + 1)) + rowsPerPage : totalRecords + rowsPerPage),
+        page: page,
+        rowsPerPage: rowsPerPage,
+        onChangePage: (newPage) => {
+            setPage(newPage);
+            fetchPurchaseInvoiceList(newPage, rowsPerPage);
+        },
+        onChangeRowsPerPage: (newRowsPerPage) => {
+            setRowsPerPage(newRowsPerPage);
+            fetchPurchaseInvoiceList(page, newRowsPerPage);
+        }
     };
 
     return (
@@ -225,7 +226,7 @@ const DataTable = ({ tableData }) => {
                             <div
                                 className='p-2'
                                 onClick={() => {
-                                    router.push('/main')
+                                    router.push('/main');
                                 }}
                                 style={{ cursor: 'pointer' }}
                             >
@@ -235,25 +236,6 @@ const DataTable = ({ tableData }) => {
                                 All Purchase Invoice List{' '}
                                 <span className='span-user-clr'>{tableData.length}</span>
                             </div>
-                            {/* <div className='col-md-3'>
-                                <div className='form-check'>
-                                    <input
-                                        type='checkbox'
-                                        name='return'
-                                        className='form-check-input'
-                                        id='return'
-                                        checked={sample === 1}
-                                        onChange={handleReturn}
-                                        style={{ marginTop: '2px' }}
-                                    />
-                                    <strong
-                                        className='form-check-strong return-chk-box'
-                                        htmlFor='return'
-                                    >
-                                        Return
-                                    </strong>
-                                </div>
-                            </div> */}
                             <div className='col-6'>
                                 Total Amount{' '}
                                 <span className='span-user-clr'>
@@ -273,7 +255,6 @@ const DataTable = ({ tableData }) => {
                 columns={columns}
                 options={options}
             />
-            {/* <Pagination /> */}
         </div>
     );
 };
