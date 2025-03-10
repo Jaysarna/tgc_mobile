@@ -55,7 +55,7 @@ const NewItem = () => {
                 item_group: formData.itemGroup,
                 stock_uom: formData.unitOfMeasure,
                 is_stock_item: formData.maintainStock ? '1' : '0',
-                // valuation_rate: formData.valuationRate,
+                valuation_rate: formData.valuationRate,
                 // standard_rate: formData.standardSellingRate,
                 opening_stock: formData.quantity,
                 // docstatus: '1',
