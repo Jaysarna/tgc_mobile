@@ -6,15 +6,16 @@ import { authHeader, getAuthHeader } from '@/helpers/Header';
 import { uid } from 'uid';
 import withAuth from '@/customhook/withAuth';
 import { handleError } from '@/Api/showError';
-import { get } from '@/configs/apiUtils';
+import { get, post } from '@/configs/apiUtils';
 import toast from 'react-hot-toast';
+import { LoadingPage } from '@/helpers/Loader';
 
 
 
 const Index = () => {
     return (
         <div>
-            <InvoiceData />
+            <Return />
         </div>
     );
 }
@@ -23,13 +24,13 @@ export default withAuth(Index);
 
 
 
-const InvoiceData = () => {
+const Return = () => {
 
     const router = useRouter();
     const { name, customer } = router.query;
 
 
-    const [customerData, setCustomerData] = useState({
+    const [invoiceData, setInvoiceData] = useState({
         customerName: '', // Initialize with an empty string,
         return_invoice: '',
         // postingDate: new Date().toISOString().substr(0, 10), // Set to today's date
@@ -54,14 +55,14 @@ const InvoiceData = () => {
             amount: 0,
         };
         // Create a copy of the current items array
-        const updatedItems = [...customerData.items];
+        const updatedItems = [...invoiceData.items];
 
         // Add the new item to the copy
         updatedItems.push(newItem);
 
         // Update the customerData state with the modified items array
-        setCustomerData({
-            ...customerData,
+        setInvoiceData({
+            ...invoiceData,
             items: updatedItems,
         });
 
@@ -70,11 +71,11 @@ const InvoiceData = () => {
     const removeList = (itemNameToFilter) => {
         // console.log(itemNameToFilter)
 
-        const filteredItems = customerData.items.filter(item => item.uid !== itemNameToFilter);
+        const filteredItems = invoiceData.items.filter(item => item.uid !== itemNameToFilter);
 
         // Update the customerData state with the filtered array
-        setCustomerData({
-            ...customerData,
+        setInvoiceData({
+            ...invoiceData,
             items: filteredItems,
         });
         // console.log(customerData.items)
@@ -83,14 +84,14 @@ const InvoiceData = () => {
 
     function handleItemChange(updatedItem) {
         // Update the item in customerData.items using the updatedItem data
-        const updatedItems2 = customerData.items.map((item) => {
+        const updatedItems2 = invoiceData.items.map((item) => {
             if (item.uid === updatedItem.uid) {
                 return updatedItem;
             }
             return item;
         });
-        setCustomerData({
-            ...customerData,
+        setInvoiceData({
+            ...invoiceData,
             items: updatedItems2
         });
 
@@ -98,24 +99,14 @@ const InvoiceData = () => {
     };
 
 
-    const [cusList, setCusList] = useState([])
+    const [invoiceFullData, setInvoiceFullData] = useState([])
 
     const route = useRouter();
 
-    const handleCustomerDataChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setCustomerData({
-            ...customerData,
-            [name]: type === 'checkbox' ? checked : value,
-        });
-    };
-
-    const handleAddCustomer = async (e) => {
+    const handleUpdateInvoice = async (e) => {
         e.preventDefault();
 
-        const authHeader = getAuthHeader()
-
-        const apiUrl = 'https://tgc67.online/api/resource/Sales%20Invoice';
+        setLoading(true)
 
 
         function buildItemsArray(jsonItems) {
@@ -124,43 +115,44 @@ const InvoiceData = () => {
                 "item_code": jsonItem.itemCode,
                 "qty": jsonItem.quantity,
                 "rate": jsonItem.rate,
+                sales_invoice_item: jsonItem.name,
+                set_warehouse: "Warehouse 1 - TGC",
             }));
         }
 
         const requestData = {
             data: {
-                "return_against": customerData.customerName,
+                "return_against": invoiceData.customerName,
                 "is_return": 1,
-                "customer": customerData.return_invoice,
+                "customer": invoiceData.return_invoice,
                 "update_stock": "1",
                 "docstatus": "1",
-                "posting_date": customerData.dueDate,
-                "items": buildItemsArray(customerData.items),
+                "posting_date": invoiceData.dueDate,
+                "items": buildItemsArray(invoiceData.items),
+                "update_billed_amount_in_delivery_note": 0,
+                amount_eligible_for_commission: -(invoiceFullData.base_rounded_total),
+                status: "Return",
 
             },
         };
 
         // console.log(requestData)
         try {
-            const response = await axios.post(apiUrl, requestData, authHeader)
+
+            const response = await post('/resource/Sales%20Invoice', requestData)
 
 
-            if (response.statusText === 'OK') {
-                alert("Return Successfully")
-                route.push('/sales/invoice/')
+            if (response) {
+                toast.success("Return Successfully")
+                // route.push('/sales/invoice/')
             }
             // console.log('API Response:', response.statusText)
         } catch (error) {
-
             console.error('API Error:', error);
-            if (err.response?.status === 403) {
-                alert("Login Expired")
-                route.push('/')
-            }
-            else {
-                handleError(err)
-            }
         }
+
+        setLoading(false)
+
     };
 
 
@@ -168,8 +160,7 @@ const InvoiceData = () => {
 
         try {
             const res = await get('/resource/Sales%20Invoice/' + name)
-            // const res = await axios.get('https://tgc67.online/api/resource/Sales%20Invoice/' + name, authHeader)
-            // console.log(res.data.data)
+
             const itemsArr = res.data.items;
             const itemsWithUuid = itemsArr.map(item => ({
                 ...item,
@@ -180,18 +171,18 @@ const InvoiceData = () => {
                 rate: item.rate,
                 amount: (-item.qty) * (item.rate)
             }));
-            setCustomerData({
-                ...customerData,
+            setInvoiceData({
+                ...invoiceData,
                 customerName: name,
                 return_invoice: customer,
                 items: itemsWithUuid
             })
-            setCusList(res.data.data)
+            setInvoiceFullData(res.data)
 
         }
         catch (err) {
             console.log(err)
-            setCusList([])
+            setInvoiceFullData([])
             if (err.response?.status === 403) {
                 toast.error("Login Expired")
                 route.push('/')
@@ -207,8 +198,8 @@ const InvoiceData = () => {
 
 
     const handleDueDateChange = (e) => {
-        setCustomerData({
-            ...customerData,
+        setInvoiceData({
+            ...invoiceData,
             dueDate: e.target.value,
         });
     };
@@ -224,9 +215,16 @@ const InvoiceData = () => {
     }, [name, customer])
 
 
+    const [isLoading, setLoading] = useState(false)
+
+
 
     return (
         <>
+            {isLoading &&
+                <LoadingPage
+                    msg='Returning'
+                />}
             <Siderbar />
             <div>
                 <div className="col-lg-12 itemOuter mt-3">
@@ -247,7 +245,7 @@ const InvoiceData = () => {
                                         </div>
                                     </div>
 
-                                    <form onSubmit={handleAddCustomer} method="post" className="row g-3 needs-validation">
+                                    <form onSubmit={handleUpdateInvoice} method="post" className="row g-3 needs-validation">
                                         <div className="col-12">
                                             <label htmlFor="customerName" className="form-label">Customer Name</label>
                                             <div className="has-validation">
@@ -256,7 +254,7 @@ const InvoiceData = () => {
                                                     name=""
                                                     className="form-control"
                                                     id=""
-                                                    value={customerData.customerName}
+                                                    value={invoiceData.customerName}
                                                     readOnly
                                                 // onChange={handlePostingDateChange}
                                                 />
@@ -271,7 +269,7 @@ const InvoiceData = () => {
 
                                                     className="form-control"
 
-                                                    value={customerData.return_invoice}
+                                                    value={invoiceData.return_invoice}
                                                     readOnly
 
                                                 />
@@ -287,7 +285,7 @@ const InvoiceData = () => {
                                                 name="dueDate"
                                                 className="form-control"
                                                 id="dueDate"
-                                                value={customerData.dueDate}
+                                                value={invoiceData.dueDate}
                                                 onChange={handleDueDateChange}
 
                                             />
@@ -301,7 +299,7 @@ const InvoiceData = () => {
                                                 "Amount",
                                             ]}
                                             title='Customer'
-                                            itemList={customerData.items}
+                                            itemList={invoiceData.items}
                                             addNewItem={addNewItem}
                                             removeList={removeList}
                                             handleItemChange={handleItemChange}

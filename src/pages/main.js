@@ -63,7 +63,7 @@ const Main = () => {
                     <>
                         <ItemCard
                             key={index}
-                            name={item.name}
+                            name={item.name == "FDR Balance" ? "Cashflow" : item.name}
                             amount={item.money}
                             url="/main"
                             color={item.color}

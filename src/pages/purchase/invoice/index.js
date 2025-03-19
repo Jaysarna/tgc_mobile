@@ -101,11 +101,16 @@ const DataTable = ({ tableData, totalRecords, page, setPage, rowsPerPage, setRow
                 }
             }
         },
+
         {
             name: 'is_return',
             options: {
                 display: false
             }
+        },
+        {
+            name: 'total_qty',
+            label: 'Total Quantity',
         },
 
         {
@@ -122,6 +127,20 @@ const DataTable = ({ tableData, totalRecords, page, setPage, rowsPerPage, setRow
             }
         },
         {
+            name: 'custom_payment_amount_in_advance',
+            label: 'Amount Pay',
+            options: {
+                customBodyRender: (value) => {
+                    return (
+                        <>
+                            $ {value}
+                        </>
+                    );
+                }
+            }
+        },
+
+        {
             name: 'outstanding_amount',
             label: 'Outstanding Amount',
             options: {
@@ -134,23 +153,7 @@ const DataTable = ({ tableData, totalRecords, page, setPage, rowsPerPage, setRow
                 }
             }
         },
-        {
-            name: 'custom_payment_amount_in_advance',
-            label: 'Total Amount Pay',
-            options: {
-                customBodyRender: (value) => {
-                    return (
-                        <>
-                            $ {value}
-                        </>
-                    );
-                }
-            }
-        },
-        {
-            name: 'total_qty',
-            label: 'Total Quantity',
-        },
+
         {
             name: 'payment',
             label: 'Make a Payment',
@@ -197,6 +200,7 @@ const DataTable = ({ tableData, totalRecords, page, setPage, rowsPerPage, setRow
     const options = {
         filterType: 'dropdown',
         responsive: 'standard',
+
         textLabels: {
             body: {
                 noMatch: 'No Records Found'

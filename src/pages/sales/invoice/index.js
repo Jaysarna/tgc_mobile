@@ -128,9 +128,10 @@ const DataTable = ({ tableData }) => {
             }
         },
 
+
         {
-            name: 'outstanding_amount',
-            label: 'Outstanding Amount',
+            name: 'advance_received',
+            label: 'Amount Pay',
             options: {
                 customBodyRender: (value) => {
                     return (
@@ -142,8 +143,8 @@ const DataTable = ({ tableData }) => {
             }
         },
         {
-            name: 'advance_received',
-            label: 'Total Amount Pay',
+            name: 'outstanding_amount',
+            label: 'Outstanding Amount',
             options: {
                 customBodyRender: (value) => {
                     return (
